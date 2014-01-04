@@ -1,0 +1,42 @@
+#!/bin/bash -
+#
+export GOPATH=$HOME/project
+mkdir -p $GOPATH/{src,bin}
+export GOBIN=$GOPATH/bin
+
+test -d $GOPATH || mkdir -p $GOPATH
+
+
+addr=$1
+case "$addr" in
+	github.com/*)
+		addr="https://$addr"
+		;;
+	git.oschina.net/*)
+		addr="http://$addr"
+		;;
+esac
+
+path=${1%.git}
+path=${path#https://}
+path=${path#http://}
+
+cd "$GOPATH/src"
+if test -d "$path"
+then
+	cd "${path}"
+	git pull </dev/null|| exit 2
+else
+	TIMEOUT=30s
+	echo "git clone: timeout $TIMEOUT"
+	timeout $TIMEOUT git clone "$addr" "${path}" || exit 1
+	cd "${path}"
+fi
+	
+set -eu
+
+go get -v
+go test -short
+export GOBIN="$GOBIN/${path//\//-}"
+go install
+echo $GOBIN/${path##*/}
