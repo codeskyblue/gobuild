@@ -1,14 +1,26 @@
 <div class="container">
 	<div >
-		<h2><img src="http://goer.cc/themes/site/default/images/logo.png"/> golang 	online compiler <small><a target="_blank" href="http://git.oschina.net/shxsun/gocompile/issues">意见反馈</a> <i>author:</i> skyblue</small></h2>
+		<h2><img src="http://goer.cc/themes/site/default/images/logo.png"/> golang online compiler <small><a target="_blank" href="http://git.oschina.net/shxsun/gocompile/issues">意见反馈</a> <i>author:</i> skyblue</small></h2>
 	</div>
 	<div class="panel panel-default">
 		<div class="panel-heading">
-		Name:
-		<i><b><span id="name">{{.}}</span></b></i>
+			source :<i><b><span id="name"> {{.FullName}}</span></b></i> 
+			
+			--- <!-- download 
+			<a href="{{.DownloadPrefix}}/{{.FullName}}/{{.Name}}.exe">windows</a>
+			<a href=#>linux</a>-->
+			<a href=/download/{{.FullName}}>[Goto download page]</a>
+			<a href="/rebuild/{{.FullName}}" id="rebuild" style="color: red; display: none">[Rebuild]</a>
 		</div>
 		<div class="panel-body">
 			<pre><span class="console" style="color:green"></span> <span class="waiting">/</span></pre>
 		</div>
 	</div>
 </div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<script src="/site.js"></script>

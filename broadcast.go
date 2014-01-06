@@ -17,20 +17,26 @@ type WriteBroadcaster struct {
 	sync.Mutex
 	buf     *bytes.Buffer
 	writers map[StreamWriter]bool
+	closed  bool
 }
 
 func NewWriteBroadcaster() *WriteBroadcaster {
 	return &WriteBroadcaster{
 		writers: make(map[StreamWriter]bool),
 		buf:     bytes.NewBuffer(nil),
+		closed:  false,
 	}
 }
 
 func (w *WriteBroadcaster) AddWriter(writer io.WriteCloser, stream string) {
 	w.Lock()
+	defer w.Unlock()
+	if w.closed {
+		writer.Close()
+		return
+	}
 	sw := StreamWriter{wc: writer, stream: stream}
 	w.writers[sw] = true
-	w.Unlock()
 }
 
 func (wb *WriteBroadcaster) NewReader(name string) ([]byte, *io.PipeReader) {
@@ -58,6 +64,7 @@ func (w *WriteBroadcaster) CloseWriters() error {
 		sw.wc.Close()
 	}
 	w.writers = make(map[StreamWriter]bool)
+	w.closed = true
 	return nil
 }
 

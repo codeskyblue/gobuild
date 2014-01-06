@@ -1,22 +1,14 @@
 #!/bin/bash -
 #
-#echo "ARGS: $@"
-#while true
-##do
-#	echo $RANDOM
-#	sleep 1
-#done
 
 PS4='$ '
-
 export PATH=/bin:/usr/bin:/usr/local/bin:$GOPATH/bin:$HOME/bin
+
+CURDIR=$(cd $(dirname $0); pwd)
 
 export GOPATH=$HOME/project
 mkdir -p $GOPATH/{src,bin}
-export GOBIN=$GOPATH/bin
-
-test -d $GOPATH || mkdir -p $GOPATH
-
+export GOBIN=$CURDIR/files
 
 addr=$1
 case "$addr" in
@@ -32,6 +24,8 @@ path=${1%.git}
 path=${path#https://}
 path=${path#http://}
 
+export GOBIN="$GOBIN/${path}"
+
 cd "$GOPATH/src"
 if test -d "$path"
 then
@@ -40,18 +34,14 @@ then
 	git pull </dev/null|| exit 2
 else
 	TIMEOUT=30s
-	echo "git clone: timeout $TIMEOUT"
+	#echo "git clone: timeout $TIMEOUT"
 	#timeout $TIMEOUT 
 	set -eu -x # open debug
 	git clone "$addr" "${path}" || exit 1
 	cd "${path}"
 fi
 	
-export GOBIN="$GOBIN/${path//\//-}"
-
-
 go get -v
 go test -short
-go install
-
-echo $GOBIN/${path##*/}
+go build
+gox '-os=linux windows darwin' '-arch=amd64 386' -output="$CURDIR/files/$path/{{.Dir}}_{{.OS}}_{{.Arch}}"
