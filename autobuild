@@ -1,5 +1,12 @@
 #!/bin/bash -
 #
+#echo "ARGS: $@"
+#while true
+##do
+#	echo $RANDOM
+#	sleep 1
+#done
+
 export GOPATH=$HOME/project
 mkdir -p $GOPATH/{src,bin}
 export GOBIN=$GOPATH/bin
@@ -29,7 +36,8 @@ then
 else
 	TIMEOUT=30s
 	echo "git clone: timeout $TIMEOUT"
-	timeout $TIMEOUT git clone "$addr" "${path}" || exit 1
+	#timeout $TIMEOUT 
+	git clone "$addr" "${path}" || exit 1
 	cd "${path}"
 fi
 	
