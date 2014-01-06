@@ -120,9 +120,7 @@ func main() {
 		bufstr, ch := NewCompileProject(addr, name)
 
 		log.Println("handle request:", addr, name)
-		//log.Println("client msg:", clientMsg)
 
-		//bufstr = "345678\n"
 		firstMsg := &Message{
 			Data: bufstr,
 		}

@@ -7,6 +7,10 @@
 #	sleep 1
 #done
 
+PS4='$ '
+
+export PATH=/bin:/usr/bin:/usr/local/bin:$GOPATH/bin:$HOME/bin
+
 export GOPATH=$HOME/project
 mkdir -p $GOPATH/{src,bin}
 export GOBIN=$GOPATH/bin
@@ -32,19 +36,22 @@ cd "$GOPATH/src"
 if test -d "$path"
 then
 	cd "${path}"
+	set -eu -x # open debug
 	git pull </dev/null|| exit 2
 else
 	TIMEOUT=30s
 	echo "git clone: timeout $TIMEOUT"
 	#timeout $TIMEOUT 
+	set -eu -x # open debug
 	git clone "$addr" "${path}" || exit 1
 	cd "${path}"
 fi
 	
-set -eu
+export GOBIN="$GOBIN/${path//\//-}"
+
 
 go get -v
 go test -short
-export GOBIN="$GOBIN/${path//\//-}"
 go install
+
 echo $GOBIN/${path##*/}
