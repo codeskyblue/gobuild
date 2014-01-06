@@ -1,0 +1,18 @@
+<div>
+	<form id="form" method="get" action="." role="get">
+		<div class="form-group">
+			<input type="text" class="form-control col-md-8" id="address" placeholder="Project address, for example>> github.com/account/something">
+		</div>
+		<button type="submit" class="btn btn-default">Start to compile</button>
+	</form>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script>
+	$("#address").keyup(function(){
+		$("#form").attr("action", "./build/"+$(this).val());
+	});
+</script>

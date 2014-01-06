@@ -158,6 +158,10 @@ func main() {
 		Layout: "layout",
 	}))
 
+	m.Get("/", func(r render.Render) {
+		r.HTML(200, "index", nil)
+	})
+
 	m.Get("/build/**", func(params martini.Params, r render.Render) {
 		log.Println(params)
 		addr := params["_1"]

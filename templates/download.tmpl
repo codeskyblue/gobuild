@@ -1,17 +1,12 @@
-<div class="container">
-	<div >
-		<h2><img src="http://goer.cc/themes/site/default/images/logo.png"/> golang online compiler <small><a target="_blank" href="http://git.oschina.net/shxsun/gocompile/issues">意见反馈</a> <i>author:</i> skyblue</small></h2>
-	</div>
-	<div>
-		<h3>downloads: <i>{{.FullName}}</i></h3>
-	</div>
-	<div>
-		<ul>
-		{{range .Files}}
-			 <li><a href={{.}}>{{.}}</a></li>
-		{{end}}
-		</ul>
-	</div>
+<div>
+	<h3>downloads: <i>{{.FullName}}</i></h3>
+</div>
+<div>
+	<ul>
+	{{range .Files}}
+		 <li><a href={{.}}>{{.}}</a></li>
+	{{end}}
+	</ul>
 </div>
 
 
