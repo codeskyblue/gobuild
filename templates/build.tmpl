@@ -5,8 +5,8 @@
 		--- <!-- download 
 		<a href="{{.DownloadPrefix}}/{{.FullName}}/{{.Name}}.exe">windows</a>
 		<a href=#>linux</a>-->
-		<a href=/download/{{.FullName}}>[Goto download page]</a>
-		<a href="/rebuild/{{.FullName}}" id="rebuild" style="color: red; display: none">[Rebuild]</a>
+		<a href="{{.JsDir}}/download/{{.FullName}}">[Goto download page]</a>
+		<a href="{{.JsDir}}/rebuild/{{.FullName}}" id="rebuild" style="color: red; display: none">[Rebuild]</a>
 	</div>
 	<div class="panel-body">
 		<pre><span class="console" style="color:green"></span> <span class="waiting">/</span></pre>

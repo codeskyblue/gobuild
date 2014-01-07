@@ -165,7 +165,7 @@ func parseConfig() (err error) {
 		options.CDN = "http://" + options.Server
 	}
 	if options.WsServer == "" {
-		options.WsServer = "ws://" + options.Server + "/websocket"
+		options.WsServer = "ws://" + options.Server
 	}
 	return err
 }
@@ -196,7 +196,7 @@ func main() {
 			"Name":           filepath.Base(addr),
 			"DownloadPrefix": options.CDN,
 			"Server":         options.Server,
-			"WsServer":       options.WsServer,
+			"WsServer":       options.WsServer + "/websocket",
 			"JsDir":          jsDir,
 		})
 	})
