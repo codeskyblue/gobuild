@@ -13,6 +13,8 @@ func Debugf(format string, a ...interface{}) {
 	}
 }
 
+var ErrTimeout = errors.New("timeout")
+
 func GoTimeout(f func() error, timeout time.Duration) (err error) {
 	done := make(chan bool)
 	go func() {
@@ -21,7 +23,7 @@ func GoTimeout(f func() error, timeout time.Duration) (err error) {
 	}()
 	select {
 	case <-time.After(timeout):
-		return errors.New("timeout")
+		return ErrTimeout
 	case <-done:
 		return
 	}

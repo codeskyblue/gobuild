@@ -4,6 +4,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"sync"
 	"time"
@@ -52,24 +53,16 @@ func (w *WriteBroadcaster) Write(p []byte) (n int, err error) {
 	defer w.Unlock()
 	w.buf.Write(p)
 	for sw := range w.writers {
-		// timeout handler
-		done := make(chan bool)
-		go func() {
-			ok := true
+		// set write timeout
+		err = GoTimeout(func() error {
 			if n, err := sw.wc.Write(p); err != nil || n != len(p) {
-				// On error, evict the writer
-				ok = false
+				return errors.New("broadcast to " + sw.stream + " error")
 			}
-			done <- ok
-		}()
-		select {
-		case ok := <-done:
-			if !ok {
-				delete(w.writers, sw)
-			}
-		case <-time.After(time.Second * 1):
-			// timeout just delete writers
-			Debugf("timeout: %s", sw.stream)
+			return nil
+		}, time.Second*1)
+		if err != nil {
+			// On error, evict the writer
+			Debugf("broadcase write error: %s, %s", sw.stream, err)
 			delete(w.writers, sw)
 		}
 	}
