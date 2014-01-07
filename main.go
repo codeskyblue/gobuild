@@ -225,7 +225,7 @@ func main() {
 		files := []string{}
 		for _, os := range OS {
 			for _, arch := range Arch {
-				outfile := fmt.Sprintf("http://%s/%s/%s_%s_%s", options.CDN, addr, basename, os, arch)
+				outfile := fmt.Sprintf("%s/%s/%s_%s_%s", options.CDN, addr, basename, os, arch)
 				if os == "windows" {
 					outfile += ".exe"
 				}
