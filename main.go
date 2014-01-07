@@ -135,8 +135,9 @@ func websocketHandle(w http.ResponseWriter, r *http.Request) {
 
 var (
 	options struct {
-		Server string `short:"s" long:"server-addr"`
-		CDN    string `short:"c" long:"cdn"`
+		Server   string `short:"s" long:"server-addr"`
+		WsServer string `short:"w" long:"ws-addr"`
+		CDN      string `short:"c" long:"cdn"`
 	}
 	args []string
 )
@@ -153,6 +154,9 @@ func parseConfig() (err error) {
 	}
 	if options.CDN == "" {
 		options.CDN = "http://" + options.Server
+	}
+	if options.WsServer == "" {
+		options.WsServer = "ws://" + options.Server + "/websocket"
 	}
 	return err
 }
@@ -183,6 +187,7 @@ func main() {
 			"Name":           filepath.Base(addr),
 			"DownloadPrefix": options.CDN,
 			"Server":         options.Server,
+			"WsServer":       options.WsServer,
 		})
 	})
 	m.Get("/rebuild/**", func(params martini.Params, r render.Render) {
@@ -216,5 +221,9 @@ func main() {
 
 	m.Get("/websocket", websocketHandle)
 
-	m.Run()
+	//m.Run()
+	http.Handle("/", m)
+	if err = http.ListenAndServe(options.Server, nil); err != nil {
+		log.Fatal(err)
+	}
 }
