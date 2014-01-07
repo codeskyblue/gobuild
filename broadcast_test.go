@@ -9,11 +9,11 @@ import (
 )
 
 func TestBroadCast(t *testing.T) {
-	//fmt.Println("Hello World!")
 	broadcast := NewWriteBroadcaster()
 	_, r1 := broadcast.NewReader("test")
 	go func() {
-		io.Copy(os.Stdout, r1)
+		//io.Copy(os.Stdout, r1)
+		r1.Close()
 	}()
 	broadcast.Write([]byte("abc"))
 	time.Sleep(time.Millisecond * 500)
