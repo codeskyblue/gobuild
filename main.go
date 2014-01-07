@@ -216,7 +216,7 @@ func main() {
 			log.Println("rebuild:", addr)
 			delete(broadcasts, addr)
 		}
-		r.Redirect(jsDir + "build/"+addr, 302)
+		r.Redirect("/build/"+addr, 302) // FIXME: this not good with nginx proxy
 	})
 
 	m.Get("/download/**", func(params martini.Params, r render.Render) {
