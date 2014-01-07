@@ -31,31 +31,19 @@ func NewWriteBroadcaster() *WriteBroadcaster {
 }
 
 func (w *WriteBroadcaster) AddWriter(writer io.WriteCloser, stream string) {
-	name := stream
-	Debugf("bc lock 2.0 reader request: %s", name)
 	w.Lock()
-	Debugf("bc lock 2.2 reader request: %s", name)
 	defer w.Unlock()
-	Debugf("bc lock 2.3 reader request: %s", name)
 	if w.closed {
-		Debugf("bc lock 2.2.1 reader request: %s", name)
 		writer.Close()
-		Debugf("bc lock 2.2.2 reader request: %s", name)
 		return
 	}
-	Debugf("bc lock 2.4 reader request: %s", name)
 	sw := StreamWriter{wc: writer, stream: stream}
-	Debugf("bc lock 2.5 reader request: %s", name)
 	w.writers[sw] = true
 }
 
 func (wb *WriteBroadcaster) NewReader(name string) ([]byte, *io.PipeReader) {
-	Debugf("bc lock 1.0 reader request: %s", name)
 	r, w := io.Pipe()
-	Debugf("bc lock 1.1 reader request: %s", name)
-	Debugf("%s: new pipe got", name)
 	wb.AddWriter(w, name)
-	Debugf("bc lock 1.2 reader request: %s", name)
 	return wb.buf.Bytes(), r
 }
 
@@ -84,7 +72,6 @@ func (w *WriteBroadcaster) Write(p []byte) (n int, err error) {
 			Debugf("timeout: %s", sw.stream)
 			delete(w.writers, sw)
 		}
-		Debugf("wbr end  - lock: %s", sw.stream)
 	}
 	return len(p), nil
 }

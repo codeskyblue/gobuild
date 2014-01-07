@@ -36,10 +36,9 @@ func startCommand(wr *WriteBroadcaster, arg0 string, args ...string) {
 	go func() {
 		err := cmd.Run()
 		if err != nil {
-			log.Println(err)
+			Debugf("start cmd error: %v", err)
 			io.WriteString(wr, "\nERROR: "+err.Error())
 		}
-		log.Println("done")
 		wr.CloseWriters()
 	}()
 }
@@ -47,58 +46,48 @@ func startCommand(wr *WriteBroadcaster, arg0 string, args ...string) {
 type Project struct {
 	Channel   chan string
 	BufferStr string
-	reader    io.ReadCloser
+	Reader    io.ReadCloser
 }
 
 func (p *Project) Close() {
-	p.reader.Close()
-	//close(p.Channel)
+	p.Reader.Close()
 }
 
 func NewProject(addr, name string) *Project {
-	Debugf("project get lock, %s", name)
 	mu.Lock()
-	defer func() {
-		Debugf("release lock")
-		mu.Unlock()
-	}()
-	Debugf("%s: lock 1 new reader done", name)
+	defer mu.Unlock()
 	if broadcasts[addr] == nil {
-		Debugf("%s: lock 1.1 new reader done", name)
 		writer := NewWriteBroadcaster()
 		broadcasts[addr] = writer
-		Debugf("%s: lock 1.2 new reader done", name)
-
 		startCommand(writer, "./autobuild", addr)
 	}
-	Debugf("%s: lock 2 new reader done", name)
 	bc := broadcasts[addr]
-	Debugf("%s: lock 2.1 new reader done", name)
 
-	ch := make(chan string)
-	Debugf("%s: new reader req", name)
+	//ch := make(chan string)
 	Debugf("%s: lock 2.2 new reader done", name)
 	bufbytes, rd := bc.NewReader(name)
-	Debugf("%s: lock 2.3 new reader done", name)
-	Debugf("%s: reader get", name)
-	Debugf("%s: lock new reader done", name)
-	go func() {
-		charBuf := make([]byte, 100)
-		defer close(ch)
-		for {
-			n, err := rd.Read(charBuf)
-			if n > 0 {
-				ch <- string(charBuf[:n]) // FIXME: if no one read channel, that is a really a problem(but test result it is not a problem), I donot know what `for line := ch does`
+	reader := NewBufReader(rd)
+	/*
+		Debugf("%s: lock 2.3 new reader done", name)
+		Debugf("%s: reader get", name)
+		Debugf("%s: lock new reader done", name)
+		go func() {
+			charBuf := make([]byte, 100)
+			defer close(ch)
+			for {
+				n, err := rd.Read(charBuf)
+				if n > 0 {
+					ch <- string(charBuf[:n]) // FIXME: if no one read channel, that is a really a problem(but test result it is not a problem), I donot know what `for line := ch does`
+				}
+				if err != nil {
+					return
+				}
 			}
-			if err != nil {
-				return
-			}
-		}
-	}()
+		}()
+	*/
 	return &Project{
 		BufferStr: string(bufbytes),
-		Channel:   ch,
-		reader:    rd,
+		Reader:    reader,
 	}
 }
 
@@ -111,10 +100,9 @@ type Message struct {
 func WsBuildServer(ws *websocket.Conn) {
 	defer ws.Close()
 	var err error
-	log.Println("handle request from:", ws.RemoteAddr())
 	clientMsg := new(Message)
 	if err = websocket.JSON.Receive(ws, &clientMsg); err != nil {
-		log.Println("read json error:", err)
+		Debugf("read json error: %v", err)
 		return
 	}
 	addr := clientMsg.Data
@@ -124,28 +112,31 @@ func WsBuildServer(ws *websocket.Conn) {
 	proj := NewProject(addr, name)
 	defer proj.Close()
 
-	log.Println("handle request:", addr, name)
-
 	firstMsg := &Message{
 		Data: proj.BufferStr,
 	}
-	log.Println("send message:", firstMsg)
 	err = websocket.JSON.Send(ws, firstMsg)
 	if err != nil {
-		log.Println("send first msg error:", err)
+		Debugf("send first msg error: %v", err)
 		return
 	}
-	log.Println("message sended")
-	for line := range proj.Channel {
-		//log.Println("send message")
-		msg := new(Message)
-		msg.Data = line
-		deadline := time.Now().Add(time.Second * 1)
-		ws.SetWriteDeadline(deadline)
-		err := websocket.JSON.Send(ws, msg)
+
+	// send the rest outputs
+	buf := make([]byte, 100)
+	msg := new(Message)
+	for {
+		n, err := proj.Reader.Read(buf)
+		if n > 0 {
+			msg.Data = string(buf[:n])
+			deadline := time.Now().Add(time.Second * 1)
+			ws.SetWriteDeadline(deadline)
+			if er := websocket.JSON.Send(ws, msg); er != nil {
+				log.Println("write failed timeout, user logout")
+				return
+			}
+		}
 		if err != nil {
-			log.Println("write failed timeout, user logout")
-			break
+			return
 		}
 	}
 	log.Println(addr, "loop ends")
