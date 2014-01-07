@@ -22,9 +22,6 @@ $(function(){
 		pgIndex = (pgIndex + 1) % 4;
 	}, 200);
 	
-	// websocket address
-	var wsUri ="ws://localhost:3000/websocket"; 
-	
 	var ws =new WebSocket(wsUri);
 	var initMessage = {
 		data: addr,

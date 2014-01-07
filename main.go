@@ -10,11 +10,11 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sync"
-	"time"
 
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/gorilla/websocket"
+	"github.com/jessevdk/go-flags"
 )
 
 var (
@@ -25,21 +25,6 @@ var (
 	OS   = []string{"windows", "linux", "darwin"}
 	Arch = []string{"386", "amd64"}
 )
-
-func runCommand(cmd string, args ...string) chan string {
-	ch := make(chan string)
-	go func() {
-		for {
-			time.Sleep(time.Second * 1)
-			mu.Lock()
-			for _, bc := range broadcasts {
-				bc.Write([]byte(time.Now().String() + "\n"))
-			}
-			mu.Unlock()
-		}
-	}()
-	return ch
-}
 
 func startCommand(wr *WriteBroadcaster, arg0 string, args ...string) {
 	// start to run build command
@@ -148,9 +133,37 @@ func websocketHandle(w http.ResponseWriter, r *http.Request) {
 	log.Println("loop ends")
 }
 
-var DownloadPrefix = "http://goplay.qiniudn.com"
+var (
+	options struct {
+		Server string `short:"s" long:"server-addr"`
+		CDN    string `short:"c" long:"cdn"`
+	}
+	args []string
+)
+
+func parseConfig() (err error) {
+	parser := flags.NewParser(&options, flags.Default)
+	err = flags.NewIniParser(parser).ParseFile("app.ini")
+	if err != nil {
+		return
+	}
+	args, err = flags.Parse(&options)
+	if err != nil {
+		return
+	}
+	if options.CDN == "" {
+		options.CDN = "http://" + options.Server
+	}
+	return err
+}
 
 func main() {
+	err := parseConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(options, args)
+	//return
 	m := martini.Classic()
 
 	// render html templates from templates directory
@@ -168,7 +181,8 @@ func main() {
 		r.HTML(200, "build", map[string]string{
 			"FullName":       addr,
 			"Name":           filepath.Base(addr),
-			"DownloadPrefix": DownloadPrefix,
+			"DownloadPrefix": options.CDN,
+			"Server":         options.Server,
 		})
 	})
 	m.Get("/rebuild/**", func(params martini.Params, r render.Render) {
@@ -185,7 +199,7 @@ func main() {
 		files := []string{}
 		for _, os := range OS {
 			for _, arch := range Arch {
-				outfile := fmt.Sprintf("%s/%s/%s_%s_%s", DownloadPrefix, addr, basename, os, arch)
+				outfile := fmt.Sprintf("http://%s/%s/%s_%s_%s", options.CDN, addr, basename, os, arch)
 				if os == "windows" {
 					outfile += ".exe"
 				}
@@ -195,7 +209,7 @@ func main() {
 		r.HTML(200, "download", map[string]interface{}{
 			"FullName":       addr,
 			"Name":           filepath.Base(addr),
-			"DownloadPrefix": DownloadPrefix,
+			"DownloadPrefix": options.CDN,
 			"Files":          files,
 		})
 	})
