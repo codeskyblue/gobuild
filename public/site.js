@@ -48,6 +48,7 @@ $(function(){
 		$rebuild.show()
 	}
 	ws.onerror = function(e) {
-		console.log("error")
+		console.log("error");
+		alert("websocket connect error");
 	}
 });

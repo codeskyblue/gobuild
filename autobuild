@@ -6,7 +6,7 @@ export PATH=/bin:/usr/bin:/usr/local/bin:$GOPATH/bin:$HOME/bin
 
 CURDIR=$(cd $(dirname $0); pwd)
 
-export GOPATH=$HOME/project
+export GOPATH=$CURDIR/project
 mkdir -p $GOPATH/{src,bin}
 export GOBIN=$CURDIR/files
 

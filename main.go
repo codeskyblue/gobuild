@@ -135,8 +135,8 @@ func websocketHandle(w http.ResponseWriter, r *http.Request) {
 
 var (
 	options struct {
-		Server   string `short:"s" long:"server-addr"`
-		WsServer string `short:"w" long:"ws-addr"`
+		Server   string `short:"s" long:"serverAddr"`
+		WsServer string `short:"w" long:"wsAddr"`
 		CDN      string `short:"c" long:"cdn"`
 	}
 	args []string
