@@ -205,6 +205,7 @@ func main() {
 	})
 	m.Get("/rebuild/**", func(params martini.Params, r render.Render) {
 		addr := params["_1"]
+		jsDir := strings.Repeat("../", strings.Count(addr, "/")+1)
 		mu.Lock()
 		defer mu.Unlock()
 		br := broadcasts[addr]
@@ -215,7 +216,7 @@ func main() {
 			log.Println("rebuild:", addr)
 			delete(broadcasts, addr)
 		}
-		r.Redirect("/build/"+addr, 302)
+		r.Redirect(jsDir + "build/"+addr, 302)
 	})
 
 	m.Get("/download/**", func(params martini.Params, r render.Render) {
