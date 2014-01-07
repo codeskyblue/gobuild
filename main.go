@@ -175,8 +175,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(options, args)
-	//return
+	fmt.Println("go build start ...")
+	fmt.Println("\tServer address:", options.Server)
+	fmt.Println("\twebsocket addr:", options.WsServer)
+	fmt.Println("\tCDN:", options.CDN)
+
 	m := martini.Classic()
 
 	// render html templates from templates directory
