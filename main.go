@@ -162,7 +162,7 @@ func parseConfig() (err error) {
 		return
 	}
 	if options.CDN == "" {
-		options.CDN = "http://" + options.Server
+		options.CDN = options.Server
 	}
 	if options.WsServer == "" {
 		options.WsServer = "ws://" + options.Server

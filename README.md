@@ -13,8 +13,12 @@
 #### 安装主程序
 	go get github.com/shxsun/gobuild
 	
-	# $ cd到程序所在目录
+	# $ cd到程序所在目录, 修改app.ini
 	go build
-	./gobuild --addr=localhost:3000 --cdn=http://gobuild.qiniudn.com/files
+	./gobuild
 	
 	
+#### 使用到的资源
+* <https://github.com/codegangsta/martini>
+* [gox](https://github.com/mitchellh/gox) 
+* ...
