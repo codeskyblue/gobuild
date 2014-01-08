@@ -205,7 +205,6 @@ func main() {
 	})
 	m.Get("/rebuild/**", func(params martini.Params, r render.Render) {
 		addr := params["_1"]
-		jsDir := strings.Repeat("../", strings.Count(addr, "/")+1)
 		mu.Lock()
 		defer mu.Unlock()
 		br := broadcasts[addr]
