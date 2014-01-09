@@ -51,4 +51,5 @@ $(function(){
 		console.log("error");
 		alert("websocket connect error");
 	}
+
 });

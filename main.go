@@ -63,28 +63,9 @@ func NewProject(addr, name string) *Project {
 	}
 	bc := broadcasts[addr]
 
-	//ch := make(chan string)
 	Debugf("%s: lock 2.2 new reader done", name)
 	bufbytes, rd := bc.NewReader(name)
 	reader := NewBufReader(rd)
-	/*
-		Debugf("%s: lock 2.3 new reader done", name)
-		Debugf("%s: reader get", name)
-		Debugf("%s: lock new reader done", name)
-		go func() {
-			charBuf := make([]byte, 100)
-			defer close(ch)
-			for {
-				n, err := rd.Read(charBuf)
-				if n > 0 {
-					ch <- string(charBuf[:n]) // FIXME: if no one read channel, that is a really a problem(but test result it is not a problem), I donot know what `for line := ch does`
-				}
-				if err != nil {
-					return
-				}
-			}
-		}()
-	*/
 	return &Project{
 		BufferStr: string(bufbytes),
 		Reader:    reader,
@@ -193,6 +174,7 @@ func main() {
 
 	m.Get("/build/**", func(params martini.Params, r render.Render) {
 		addr := params["_1"]
+		log.Println(addr, "END")
 		jsDir := strings.Repeat("../", strings.Count(addr, "/")+1)
 		r.HTML(200, "build", map[string]string{
 			"FullName":       addr,
@@ -206,8 +188,12 @@ func main() {
 	m.Get("/rebuild/**", func(params martini.Params, r render.Render) {
 		addr := params["_1"]
 		mu.Lock()
-		defer mu.Unlock()
+		defer func(){
+			mu.Unlock()
+			r.Redirect("/build/"+addr, 302) // FIXME: this not good with nginx proxy
+		}()
 		br := broadcasts[addr]
+		log.Println("rebuild", addr, "END")
 		if br == nil {
 			return
 		}
@@ -215,7 +201,7 @@ func main() {
 			log.Println("rebuild:", addr)
 			delete(broadcasts, addr)
 		}
-		r.Redirect("/build/"+addr, 302) // FIXME: this not good with nginx proxy
+		log.Println("end rebuild")
 	})
 
 	m.Get("/download/**", func(params martini.Params, r render.Render) {
