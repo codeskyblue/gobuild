@@ -1,18 +1,47 @@
-<div>
-	<form id="form" method="get" action="." role="get">
-		<div class="form-group">
-			<input type="text" class="form-control col-md-8" id="address" placeholder="Project address, for example>> github.com/account/something" required autofocus >
+<div class="row clearfix">
+	<div class="col-md-12 column">
+		<form id="form" role="form" method="get" action="#">
+			<div class="form-group">
+				<label for="name">gits project address</label>
+				<input type="text" class="form-control col-md-8" id="address" placeholder="github.com/user/project" required autofocus/>
+			</div>
+			<button type="submit" class="btn btn-default">在线编译</button>
+		</form>
+	</div>
+</div>
+<hr/>
+<div class="row clearfix">
+	<div class="col-md-12 column">
+		<p>
+		该项目还处于起步的阶段，肯定还有许多需要完善的。如果你感觉哪里需要改进的地方，直接<a href="https://github.com/shxsun/gobuild/issues">提交个issue</a>就可以啦。
+		<br/>
+		<strong>我们非常重视每一个反馈</strong>。只要我们能搞定的，我们都尽量搞定；搞不定的,我们也会想着法的搞定。
+		</p>
+	</div>
+</div>
+<div class="row clearfix">
+	<div class="col-md-12 column">
+		<h2>案例</h2>
+		<ul>
+			<li><a href="./build/github.com/beego/bee">在线编译 github.com/beego/bee</a></li>
+			<li><a href="./build/github.com/gpmgo/gopm">在线编译 github.com/gpmgo/gopm</a></li>
+			<li><a href="./build/github.com/laher/goxc">在线编译 github.com/laher/goxc</a></li>
+			<li><a href="./build/github.com/parkghost/gohttpbench">在线编译 github.com/parkghost/gohttpbench</a></li>
+			<li>...</li>
+		</ul>
+	</div>
+</div>
+<div class="row clearfix">
+	<div class="col-md-12 column">
+		<div class="text-right">
+			<small>author: <em>skyblue</em>、<em>Coder</em></small>
 		</div>
-		<button type="submit" class="btn btn-default">Start to compile</button>
-	</form>
+	</div>
 </div>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://code.jquery.com/jquery.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-<script>
-	$("#address").on('input',(function(){
-		$("#form").attr("action", "./build/"+$(this).val());
-	}));
-</script>
+<script src="./home.js"></script>
+

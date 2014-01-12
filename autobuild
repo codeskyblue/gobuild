@@ -2,7 +2,7 @@
 #
 
 PS4='$ '
-export PATH=/bin:/usr/bin:/usr/local/bin:$GOPATH/bin:$HOME/bin
+export PATH=/bin:/usr/bin:/usr/local/bin:$GOPATH/bin:$HOME/bin:$PATH
 
 CURDIR=$(cd $(dirname $0); pwd)
 
@@ -41,6 +41,7 @@ else
 	cd "${path}"
 fi
 	
+go version
 go get -v
 #go test -i -short -timeout 2m
 CGO_ENABLED=0 go build
