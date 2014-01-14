@@ -1,5 +1,11 @@
 <div>
-	<h3>downloads: <i>{{.FullName}}</i></h3>
+	<h4>copy to command to download directly(脚本会自动识别平台)</h4>
+	<code>
+		curl -s http://{{.Server}}/dlscript.sh | PROJECT={{.Project}} bash
+	</code>
+</div>
+<div>
+	<h3>downloads: <i>{{.Project}}</i></h3>
 </div>
 <div>
 	<ul>

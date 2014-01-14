@@ -2,7 +2,7 @@
 package main
 
 import (
-	//"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"text/template"
 	"time"
 
 	"code.google.com/p/go.net/websocket"
@@ -130,6 +131,8 @@ var (
 		CDN      string `short:"c" long:"cdn"`
 	}
 	args []string
+
+	listenAddr = ""
 )
 
 func parseConfig() (err error) {
@@ -143,11 +146,13 @@ func parseConfig() (err error) {
 		return
 	}
 	if options.CDN == "" {
-		options.CDN = options.Server
+		options.CDN = "http://" + options.Server + "/files"
 	}
 	if options.WsServer == "" {
 		options.WsServer = "ws://" + options.Server
 	}
+	sepIndex := strings.Index(options.Server, ":")
+	listenAddr = options.Server[sepIndex:]
 	return err
 }
 
@@ -157,7 +162,7 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("go build start ...")
-	fmt.Println("\tServer address:", options.Server)
+	fmt.Println("\tlisten address:", listenAddr)
 	fmt.Println("\twebsocket addr:", options.WsServer)
 	fmt.Println("\tCDN:", options.CDN)
 
@@ -188,7 +193,7 @@ func main() {
 	m.Get("/rebuild/**", func(params martini.Params, r render.Render) {
 		addr := params["_1"]
 		mu.Lock()
-		defer func(){
+		defer func() {
 			mu.Unlock()
 			r.Redirect("/build/"+addr, 302) // FIXME: this not good with nginx proxy
 		}()
@@ -202,6 +207,26 @@ func main() {
 			delete(broadcasts, addr)
 		}
 		log.Println("end rebuild")
+	})
+
+	m.Get("/dlscript.sh", func(params martini.Params) (s string, err error) {
+		project := "not used" //params["p"]
+		//log.Println(params)
+		t, err := template.ParseFiles("templates/dlscript.sh.tmpl")
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		buf := bytes.NewBuffer(nil)
+		err = t.Execute(buf, map[string]interface{}{
+			"Project": project,
+			"CDN":     options.CDN,
+		})
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		return string(buf.Bytes()), nil
 	})
 
 	m.Get("/download/**", func(params martini.Params, r render.Render) {
@@ -219,16 +244,18 @@ func main() {
 			}
 		}
 		r.HTML(200, "download", map[string]interface{}{
-			"FullName":       addr,
-			"Name":           filepath.Base(addr),
-			"DownloadPrefix": options.CDN,
-			"Files":          files,
+			"Project": addr,
+			"Server":  options.Server,
+			"Name":    filepath.Base(addr),
+			"CDN":     options.CDN,
+			"Files":   files,
 		})
 	})
 
 	http.Handle("/", m)
 	http.Handle("/websocket", websocket.Handler(WsBuildServer))
-	if err = http.ListenAndServe(options.Server, nil); err != nil {
+
+	if err = http.ListenAndServe(listenAddr, nil); err != nil {
 		log.Fatal(err)
 	}
 }

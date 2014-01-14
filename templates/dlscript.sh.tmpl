@@ -1,0 +1,53 @@
+#!/bin/bash -
+#
+# script for project github.com/shxsun/gobuild
+#
+
+CDN={{.CDN}}
+if [[ "$CDN" = "{{"."}}" ]]
+then
+	CDN="http://127.0.0.1:3000"
+fi
+
+#PROJECT={{.Project}}
+# get env from external
+if [[ "$PROJECT" = "" ]]
+then
+	echo "require var PROJECT" 1>&2
+	exit 1
+fi
+
+OS(){
+	local os=
+	case $(uname -s | awk '{print tolower($0)}') in
+		linux) os=linux ;;
+		darwin) os=darwin;;
+		default) os=windows;;
+	esac
+	echo "$os"
+}
+
+Arch(){
+	local arch=
+	case $(uname -m) in
+		x86_64) arch=amd64 ;;
+		i386|i686) arch=386 ;;
+	esac
+	echo "$arch"
+}
+
+set -eu
+os=$(OS)
+arch=$(Arch)
+
+echo "OS: $os"
+echo "Arch: $arch"
+
+ext=
+if [[ "$os" = "windows" ]]
+then
+	ext=".exe"
+fi
+basename=$(basename $PROJECT)
+fullname="${basename}_${os}_${arch}${ext}"
+wget "$CDN/$PROJECT/$fullname" -O $basename && chmod +x $basename
