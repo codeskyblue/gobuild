@@ -31,7 +31,7 @@ Arch(){
 	local arch=
 	case $(uname -m) in
 		x86_64) arch=amd64 ;;
-		i386|i686) arch=386 ;;
+		i386|i486|i586|i686) arch=386 ;;
 	esac
 	echo "$arch"
 }
