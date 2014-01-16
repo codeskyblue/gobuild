@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os/exec"
 	"path/filepath"
@@ -18,12 +17,15 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/jessevdk/go-flags"
+	"github.com/shxsun/klog"
 )
 
 var (
 	mu         = &sync.Mutex{}
 	broadcasts = make(map[string]*WriteBroadcaster)
 	totalUser  = 0
+
+	lg = klog.DevLog
 
 	OS   = []string{"windows", "linux", "darwin"}
 	Arch = []string{"386", "amd64"}
@@ -89,7 +91,7 @@ func WsBuildServer(ws *websocket.Conn) {
 	}
 	addr := clientMsg.Data
 	name := ws.RemoteAddr().String()
-	log.Println("handle request project:", addr, name)
+	lg.Debug("handle request project:", addr, name)
 
 	proj := NewProject(addr, name)
 	defer proj.Close()
@@ -113,7 +115,7 @@ func WsBuildServer(ws *websocket.Conn) {
 			deadline := time.Now().Add(time.Second * 1)
 			ws.SetWriteDeadline(deadline)
 			if er := websocket.JSON.Send(ws, msg); er != nil {
-				log.Println("write failed timeout, user logout")
+				lg.Debug("write failed timeout, user logout")
 				return
 			}
 		}
@@ -121,7 +123,7 @@ func WsBuildServer(ws *websocket.Conn) {
 			return
 		}
 	}
-	log.Println(addr, "loop ends")
+	lg.Debug(addr, "loop ends")
 }
 
 var (
@@ -157,11 +159,11 @@ func parseConfig() (err error) {
 }
 
 func main() {
-	err := parseConfig()
-	if err != nil {
-		log.Fatal(err)
+	var err error
+	if err = parseConfig(); err != nil {
+		return
 	}
-	fmt.Println("go build start ...")
+	lg.Info("gobuild service stated ...")
 	fmt.Println("\tlisten address:", listenAddr)
 	fmt.Println("\twebsocket addr:", options.WsServer)
 	fmt.Println("\tCDN:", options.CDN)
@@ -179,7 +181,7 @@ func main() {
 
 	m.Get("/build/**", func(params martini.Params, r render.Render) {
 		addr := params["_1"]
-		log.Println(addr, "END")
+		lg.Debug(addr, "END")
 		jsDir := strings.Repeat("../", strings.Count(addr, "/")+1)
 		r.HTML(200, "build", map[string]string{
 			"FullName":       addr,
@@ -198,23 +200,48 @@ func main() {
 			r.Redirect("/build/"+addr, 302) // FIXME: this not good with nginx proxy
 		}()
 		br := broadcasts[addr]
-		log.Println("rebuild", addr, "END")
+		lg.Debug("rebuild", addr, "END")
 		if br == nil {
 			return
 		}
 		if br.closed {
-			log.Println("rebuild:", addr)
+			lg.Debug("rebuild:", addr)
 			delete(broadcasts, addr)
 		}
-		log.Println("end rebuild")
+		lg.Debug("end rebuild")
+	})
+
+	// for autobuild script upload result
+	m.Post("/api/update", func(req *http.Request) (int, string) {
+		// for secure reason, only accept 127.0.0.1 address
+		lg.Warnf("Unexpected request: %s", req.RemoteAddr)
+		if !strings.HasPrefix(req.RemoteAddr, "127.0.0.1:") {
+			lg.Warnf("Unexpected request: %s", req.RemoteAddr)
+			return 200, ""
+		}
+		project, sha := req.FormValue("p"), req.FormValue("sha")
+		lg.Debug(project, sha)
+		return 200, "OK"
+	})
+
+	m.Get("/dl", func(req *http.Request, r render.Render) {
+		os, arch := req.FormValue("os"), req.FormValue("arch") //"windows", "amd64"
+		project := req.FormValue("p")                          //"github.com/shxsun/fswatch"
+		filename := filepath.Base(project)
+		if os == "windows" {
+			filename += ".exe"
+		}
+
+		// sha should get from db
+		sha := "d1077e2e106489b81c6a404e6951f1fca8967172"
+		r.Redirect(filepath.Join(options.CDN, project, sha, os+"_"+arch, filename), 302)
 	})
 
 	m.Get("/dlscript.sh", func(params martini.Params) (s string, err error) {
 		project := "not used" //params["p"]
-		//log.Println(params)
 		t, err := template.ParseFiles("templates/dlscript.sh.tmpl")
 		if err != nil {
-			log.Println(err)
+			lg.Error(err)
 			return
 		}
 		buf := bytes.NewBuffer(nil)
@@ -223,7 +250,7 @@ func main() {
 			"CDN":     options.CDN,
 		})
 		if err != nil {
-			log.Println(err)
+			lg.Error(err)
 			return
 		}
 		return string(buf.Bytes()), nil
@@ -256,6 +283,6 @@ func main() {
 	http.Handle("/websocket", websocket.Handler(WsBuildServer))
 
 	if err = http.ListenAndServe(listenAddr, nil); err != nil {
-		log.Fatal(err)
+		lg.Fatal(err)
 	}
 }

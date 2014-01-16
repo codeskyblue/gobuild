@@ -3,6 +3,13 @@
 	<code>
 		curl -s http://{{.Server}}/dlscript.sh | PROJECT={{.Project}} bash
 	</code>
+	<code>
+		curl -s "http://{{.Server}}/dl?p=github.com/shxsun/fswatch&os=windows&arch=amd64&branch=latest" | bash
+
+	</code>
+	<code>
+		curl -s "http://{{.Server}}/dl?p=github.com/shxsun/fswatch" | bash
+	</code>
 </div>
 <div>
 	<h3>downloads: <i>{{.Project}}</i></h3>
