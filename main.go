@@ -221,10 +221,19 @@ func main() {
 		}
 		project, sha := req.FormValue("p"), req.FormValue("sha")
 		lg.Debug(project, sha)
+
+		record := new(Latest)
+		record.Project = project
+		record.Sha = sha
+		_, err := Engine.InsertOne(record)
+		if err != nil {
+			lg.Error(err)
+			return 500, err.Error()
+		}
 		return 200, "OK"
 	})
 
-	m.Get("/dl", func(req *http.Request, r render.Render) {
+	m.Get("/dl/latest", func(req *http.Request, r render.Render) (code int, body string) { //, r render.Render) {
 		os, arch := req.FormValue("os"), req.FormValue("arch") //"windows", "amd64"
 		project := req.FormValue("p")                          //"github.com/shxsun/fswatch"
 		filename := filepath.Base(project)
@@ -233,12 +242,23 @@ func main() {
 		}
 
 		// sha should get from db
-		sha := "d1077e2e106489b81c6a404e6951f1fca8967172"
-		r.Redirect(filepath.Join(options.CDN, project, sha, os+"_"+arch, filename), 302)
+		record := new(Latest)
+		ok, err := Engine.Where("project=?", project).Get(record)
+		if err != nil {
+			return 500, err.Error()
+		}
+		if !ok {
+			return 404, fmt.Sprintf("404: project(%s) not found", project)
+		}
+		//sha := "d1077e2e106489b81c6a404e6951f1fca8967172"
+		sha := record.Sha
+
+		r.Redirect(options.CDN+"/"+filepath.Join(project, sha, os+"_"+arch, filename), 302)
+		return
 	})
 
-	m.Get("/dlscript.sh", func(params martini.Params) (s string, err error) {
-		project := "not used" //params["p"]
+	m.Get("/dlscript/**", func(params martini.Params) (s string, err error) {
+		project := params["_1"] //"not used" //params["p"]
 		t, err := template.ParseFiles("templates/dlscript.sh.tmpl")
 		if err != nil {
 			lg.Error(err)
@@ -247,7 +267,8 @@ func main() {
 		buf := bytes.NewBuffer(nil)
 		err = t.Execute(buf, map[string]interface{}{
 			"Project": project,
-			"CDN":     options.CDN,
+			"Server":  options.Server,
+			//"CDN":     options.CDN,
 		})
 		if err != nil {
 			lg.Error(err)

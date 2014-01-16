@@ -3,19 +3,10 @@
 # script for project github.com/shxsun/gobuild
 #
 
-CDN={{.CDN}}
-if [[ "$CDN" = "{{"."}}" ]]
-then
-	CDN="http://127.0.0.1:3000"
-fi
-
-#PROJECT={{.Project}}
-# get env from external
-if [[ "$PROJECT" = "" ]]
-then
-	echo "require var PROJECT" 1>&2
-	exit 1
-fi
+SERVER={{.Server}}
+[[ "$SERVER" = "{{"."}}" ]] && SERVER="127.0.0.1:3000"
+PROJECT={{.Project}}
+[[ "$PROJECT" = "{{"."}}" ]] && PROJECT="github.com/shxsun/fswatch"
 
 OS(){
 	local os=
@@ -49,5 +40,6 @@ then
 	ext=".exe"
 fi
 basename=$(basename $PROJECT)
-fullname="${basename}_${os}_${arch}${ext}"
-wget "$CDN/$PROJECT/$fullname" -O $basename && chmod +x $basename
+fullname="${basename}${ext}"
+#wget "$CDN/$PROJECT/$fullname" -O $basename && chmod +x $basename
+curl "http://$SERVER/dl/latest/?p=$PROJECT&os=$os&arch=$arch" && chmod +x "${basename}"

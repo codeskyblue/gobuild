@@ -1,14 +1,11 @@
 <div>
 	<h4>copy to command to download directly(脚本会自动识别平台)</h4>
 	<code>
-		curl -s http://{{.Server}}/dlscript.sh | PROJECT={{.Project}} bash
+		curl -s http://{{.Server}}/dlscript/{{.Project}} | bash
 	</code>
+	<h4>download through url(need to specify os and arch), for example below</h4>
 	<code>
-		curl -s "http://{{.Server}}/dl?p=github.com/shxsun/fswatch&os=windows&arch=amd64&branch=latest" | bash
-
-	</code>
-	<code>
-		curl -s "http://{{.Server}}/dl?p=github.com/shxsun/fswatch" | bash
+		curl -s "http://{{.Server}}/dl/latest?p={{.Project}}&os=windows&arch=amd64"
 	</code>
 </div>
 <div>
