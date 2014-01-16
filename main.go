@@ -233,7 +233,7 @@ func main() {
 		return 200, "OK"
 	})
 
-	m.Get("/dl/latest", func(req *http.Request, r render.Render) (code int, body string) { //, r render.Render) {
+	m.Get("/dl", func(req *http.Request, r render.Render) (code int, body string) { //, r render.Render) {
 		os, arch := req.FormValue("os"), req.FormValue("arch") //"windows", "amd64"
 		project := req.FormValue("p")                          //"github.com/shxsun/fswatch"
 		filename := filepath.Base(project)

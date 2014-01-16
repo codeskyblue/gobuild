@@ -3,10 +3,10 @@
 # script for project github.com/shxsun/gobuild
 #
 
-SERVER={{.Server}}
-[[ "$SERVER" = "{{"."}}" ]] && SERVER="127.0.0.1:3000"
-PROJECT={{.Project}}
-[[ "$PROJECT" = "{{"."}}" ]] && PROJECT="github.com/shxsun/fswatch"
+server={{.Server}}
+[[ "$server" = "{{"."}}" ]] && server="127.0.0.1:3000"
+project={{.Project}}
+[[ "$project" = "{{"."}}" ]] && project="github.com/shxsun/fswatch"
 
 OS(){
 	local os=
@@ -32,15 +32,12 @@ set -eu
 os=$(OS)
 arch=$(Arch)
 
-echo "OS: $os"
-echo "Arch: $arch"
+printf "=== os: %s, arch: %s\n" "$os" "$arch"
 
 ext=
-if [[ "$os" = "windows" ]]
-then
-	ext=".exe"
-fi
-basename=$(basename $PROJECT)
+[[ "$os" = "windows" ]] && ext=".exe"
+
+basename=$(basename $project)
 fullname="${basename}${ext}"
-#wget "$CDN/$PROJECT/$fullname" -O $basename && chmod +x $basename
-curl "http://$SERVER/dl/latest/?p=$PROJECT&os=$os&arch=$arch" && chmod +x "${basename}"
+#wget "$CDN/$project/$fullname" -O $basename && chmod +x $basename
+curl -o "$fullname" "http://$server/dl?p=$project&os=$os&arch=$arch" && chmod +x "${fullname}"
