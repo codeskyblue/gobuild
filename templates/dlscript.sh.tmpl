@@ -13,7 +13,7 @@ OS(){
 	case $(uname -s | awk '{print tolower($0)}') in
 		linux) os=linux ;;
 		darwin) os=darwin;;
-		default) os=windows;;
+		*) os=windows;;
 	esac
 	echo "$os"
 }
@@ -23,6 +23,7 @@ Arch(){
 	case $(uname -m) in
 		x86_64) arch=amd64 ;;
 		i386|i486|i586|i686) arch=386 ;;
+		*) arch=unknown;;
 	esac
 	echo "$arch"
 }
