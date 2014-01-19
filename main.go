@@ -158,27 +158,20 @@ func parseConfig() (err error) {
 	return err
 }
 
-func main() {
-	var err error
-	if err = parseConfig(); err != nil {
-		return
-	}
-	lg.Info("gobuild service stated ...")
-	fmt.Println("\tlisten address:", listenAddr)
-	fmt.Println("\twebsocket addr:", options.WsServer)
-	fmt.Println("\tCDN:", options.CDN)
+var m = martini.Classic()
 
-	m := martini.Classic()
-
+func init() {
 	// render html templates from templates directory
 	m.Use(render.Renderer(render.Options{
 		Layout: "layout",
 	}))
+	initRouter()
+}
 
+func initRouter() {
 	m.Get("/", func(r render.Render) {
 		r.HTML(200, "index", nil)
 	})
-
 	m.Get("/build/**", func(params martini.Params, r render.Render) {
 		addr := params["_1"]
 		lg.Debug(addr, "END")
@@ -225,7 +218,7 @@ func main() {
 		record := new(Latest)
 		record.Project = project
 		record.Sha = sha
-		_, err := Engine.InsertOne(record)
+		err := SyncProject(record)
 		if err != nil {
 			lg.Error(err)
 			return 500, err.Error()
@@ -233,7 +226,7 @@ func main() {
 		return 200, "OK"
 	})
 
-	m.Get("/dl", func(req *http.Request, r render.Render) (code int, body string) { //, r render.Render) {
+	m.Get("/dl", func(req *http.Request, r render.Render) (code int, body string) {
 		os, arch := req.FormValue("os"), req.FormValue("arch") //"windows", "amd64"
 		project := req.FormValue("p")                          //"github.com/shxsun/fswatch"
 		filename := filepath.Base(project)
@@ -242,23 +235,18 @@ func main() {
 		}
 
 		// sha should get from db
-		record := new(Latest)
-		ok, err := Engine.Where("project=?", project).Get(record)
+		//sha := "d1077e2e106489b81c6a404e6951f1fca8967172"
+		sha, err := GetSha(project)
 		if err != nil {
 			return 500, err.Error()
 		}
-		if !ok {
-			return 404, fmt.Sprintf("404: project(%s) not found", project)
-		}
-		//sha := "d1077e2e106489b81c6a404e6951f1fca8967172"
-		sha := record.Sha
-
+		// path like: cdn://project/sha/os_arch/filename
 		r.Redirect(options.CDN+"/"+filepath.Join(project, sha, os+"_"+arch, filename), 302)
 		return
 	})
 
 	m.Get("/dlscript/**", func(params martini.Params) (s string, err error) {
-		project := params["_1"] //"not used" //params["p"]
+		project := params["_1"]
 		t, err := template.ParseFiles("templates/dlscript.sh.tmpl")
 		if err != nil {
 			lg.Error(err)
@@ -299,6 +287,17 @@ func main() {
 			"Files":   files,
 		})
 	})
+}
+
+func main() {
+	var err error
+	if err = parseConfig(); err != nil {
+		return
+	}
+	lg.Info("gobuild service stated ...")
+	fmt.Println("\tlisten address:", listenAddr)
+	fmt.Println("\twebsocket addr:", options.WsServer)
+	fmt.Println("\tCDN:", options.CDN)
 
 	http.Handle("/", m)
 	http.Handle("/websocket", websocket.Handler(WsBuildServer))

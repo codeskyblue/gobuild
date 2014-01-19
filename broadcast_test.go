@@ -3,7 +3,7 @@ package main
 
 import (
 	"io"
-	"os"
+	"io/ioutil"
 	"testing"
 	"time"
 )
@@ -21,7 +21,7 @@ func TestBroadCast(t *testing.T) {
 	if string(bufstr) != "abc" {
 		t.Errorf("expect []byte(abc), but got: []byte(%s)", string(bufstr))
 	}
-	go io.Copy(os.Stdout, r2)
+	go io.Copy(ioutil.Discard, r2)
 	broadcast.Write([]byte("ABC"))
 	broadcast.CloseWriters()
 }
