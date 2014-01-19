@@ -1,21 +1,47 @@
 <div>
-	<h4>copy to command to download directly(脚本会自动识别平台)</h4>
+	project: <a href="http://{{.Project}}">{{.Project}}</a>
+	<div>
+		<h3>Select <i>OS</i> and <i>Arch</i></h3>
+		<form role="form" class="form-horizontal" target="/dl">
+			<input type="hidden" name="p" value="{{.Project}}" />
+			<div class="form-group">
+				<label class="col-md-2">操作系统</label>
+				<div class="col-md-10">
+					<label><input type="radio" name="os" value="windows" checked /> windows</label>
+					<label><input type="radio" name="os" value="linux" /> linux</label>
+					<label><input type="radio" name="os" value="darwin" /> mac</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2">处理器</label>
+				<div class="col-md-10">
+					<label><input type="radio" name="arch" value="amd64" checked /> amd64</label>
+					<label><input type="radio" name="arch" value="i386" /> i386</label>
+					<label><input type="radio" name="arch" value="arm" /> arm</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2">版本</label>
+				<div class="col-md-10">
+					<label><input type="radio" name="version" value="latest" checked /> latest</label>
+				</div>
+			</div>
+			<button type="submit" class="btn btn-default">download</button>
+		</form>
+	</div>
+
+	<hr/>
+	<p>
+		<p>
+		download through <strong>curl</strong>
+		</p>
+		curl -s "http://{{.Server}}/dl?p={{.Project}}&os=windows&arch=amd64"
+	</p>
+
+	<h4>copy to download autometically(脚本会自动识别平台)</h4>
 	<code>
 		curl -s http://{{.Server}}/dlscript/{{.Project}} | bash
 	</code>
 	<h4>download through url(need to specify os and arch), for example below</h4>
-	<code>
-		curl -s "http://{{.Server}}/dl/latest?p={{.Project}}&os=windows&arch=amd64"
-	</code>
-</div>
-<div>
-	<h3>downloads: <i>{{.Project}}</i></h3>
-</div>
-<div>
-	<ul>
-	{{range .Files}}
-		 <li><a href={{.}}>{{.}}</a></li>
-	{{end}}
-	</ul>
 </div>
 
