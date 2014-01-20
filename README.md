@@ -2,7 +2,7 @@
 [![Build Status](https://drone.io/github.com/shxsun/gobuild/status.png)](https://drone.io/github.com/shxsun/gobuild/latest)
 [![Total views](https://sourcegraph.com/api/repos/github.com/shxsun/gobuild/counters/views.png)](https://sourcegraph.com/github.com/shxsun/gobuild)
 
-在线服务的网站: <http://build.golangtc.com>
+在线服务的网站: <http://gobuild.io>
 
 ## 安装说明
 #### 安装依赖
