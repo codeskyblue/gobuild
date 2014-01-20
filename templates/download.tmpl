@@ -2,7 +2,7 @@
 	project: <a href="http://{{.Project}}">{{.Project}}</a>
 	<div>
 		<h3>Select <i>OS</i> and <i>Arch</i></h3>
-		<form role="form" class="form-horizontal" target="/dl">
+		<form role="form" class="form-horizontal" action="/dl">
 			<input type="hidden" name="p" value="{{.Project}}" />
 			<div class="form-group">
 				<label class="col-md-2">操作系统</label>
@@ -16,8 +16,10 @@
 				<label class="col-md-2">处理器</label>
 				<div class="col-md-10">
 					<label><input type="radio" name="arch" value="amd64" checked /> amd64</label>
-					<label><input type="radio" name="arch" value="i386" /> i386</label>
+					<label><input type="radio" name="arch" value="386" /> 386</label>
+					<!--
 					<label><input type="radio" name="arch" value="arm" /> arm</label>
+					-->
 				</div>
 			</div>
 			<div class="form-group">
@@ -32,16 +34,13 @@
 
 	<hr/>
 	<p>
-		<p>
-		download through <strong>curl</strong>
-		</p>
-		curl -s "http://{{.Server}}/dl?p={{.Project}}&os=windows&arch=amd64"
+		<h4> 使用wget,指定os和arch下载</h4>
+		wget "http://{{.Server}}/dl?p={{.Project}}&os=windows&arch=amd64"
 	</p>
 
-	<h4>copy to download autometically(脚本会自动识别平台)</h4>
+	<h4>使用脚本下载</h4>
 	<code>
 		curl -s http://{{.Server}}/dlscript/{{.Project}} | bash
 	</code>
-	<h4>download through url(need to specify os and arch), for example below</h4>
 </div>
 

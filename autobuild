@@ -47,7 +47,7 @@ go get -u -v
 CGO_ENABLED=0 go build
 gox '-os=linux windows darwin' '-arch=amd64 386' -output="$CURDIR/files/$path/$SHA/{{.OS}}_{{.Arch}}/{{.Dir}}"
 
-set -x
-addr=$(cat "$CURDIR/app.ini" | grep "^serverAddr" | awk -F= '{print $2}' | xargs echo -n)
-curl -d "p=$path" -d "sha=$SHA" $addr/api/update
+set +x
+addr=$(cat "$CURDIR/app.ini" | grep "^serverAddr" | awk -F: '{print "127.0.0.1:" $2}' | xargs echo -n)
+curl -s -d "p=$path" -d "sha=$SHA" $addr/api/update
 

@@ -40,4 +40,4 @@ ext=
 basename=$(basename $project)
 fullname="${basename}${ext}"
 #wget "$CDN/$project/$fullname" -O $basename && chmod +x $basename
-curl -o "$fullname" "http://$server/dl?p=$project&os=$os&arch=$arch" && chmod +x "${fullname}"
+curl -o "$fullname" -SL "http://$server/dl?p=$project&os=$os&arch=$arch" && chmod +x "${fullname}" && echo "success download -- ${fullname}"
