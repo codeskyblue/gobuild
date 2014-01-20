@@ -172,6 +172,10 @@ func initRouter() {
 	m.Get("/", func(r render.Render) {
 		r.HTML(200, "index", nil)
 	})
+	m.Get("/github.com/**", func(params martini.Params, r render.Render) {
+		r.Redirect("/download/github.com/"+params["_1"], 302)
+	})
+
 	m.Get("/build/**", func(params martini.Params, r render.Render) {
 		addr := params["_1"]
 		lg.Debug(addr, "END")
