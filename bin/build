@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+
+# args
+PROJECT=$1
+
+# determine root
+root=$(cd $(dirname $0); pwd)
+
+echo "Creating GOPATH(FIXME: implement it on server)"
+gopath=$root
+export GOPATH="$gopath"
+
+echo "Downlaoding $PROJECT"
+go get -d "$PROJECT"
+
+# clone the specified ref
+cd $GOPATH/src/$PROJECT
+if [[ ! -z $REF ]]; then
+	git fetch origin
+	git checkout $REF
+fi
+
+echo "Setting version to $VERSION"
+# FIXME: todo
+
+echo "Compiling"
+go get .
+
+if [ -d $GOPATH/bin/${GOOS}_${GOARCH} ]; then
+	BINARY="$(ls -1 $GOPATH/bin/${GOOS}_${GOARCH}/$(echo $PROJECT | cut -d/ -f3)*)"
+else
+	BINARY="$GOPATH/bin/$(echo $PROJECT | cut -d/ -f3)"
+fi
+
+echo "Uploading binary"
+#addr=$(cat "$root/app.ini" | grep "^serverAddr" | awk -F: '{print "127.0.0.1:" $2}' | xargs echo -n)
+curl -s -d "p=$path" -d "sha=$SHA" $addr/api/update
+

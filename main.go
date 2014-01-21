@@ -17,6 +17,7 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/jessevdk/go-flags"
+	"github.com/shxsun/gobuild/models"
 	"github.com/shxsun/klog"
 )
 
@@ -219,10 +220,11 @@ func initRouter() {
 		project, sha := req.FormValue("p"), req.FormValue("sha")
 		lg.Debug(project, sha)
 
-		record := new(Latest)
-		record.Project = project
+		record := new(models.Project)
+		record.Name = project
+		record.Project = project // FIXME: delete it
 		record.Sha = sha
-		err := SyncProject(record)
+		err := models.SyncProject(record)
 		if err != nil {
 			lg.Error(err)
 			return 500, err.Error()
@@ -240,7 +242,7 @@ func initRouter() {
 
 		// sha should get from db
 		//sha := "d1077e2e106489b81c6a404e6951f1fca8967172"
-		sha, err := GetSha(project)
+		sha, err := models.GetSha(project)
 		if err != nil {
 			return 500, err.Error()
 		}
