@@ -1,6 +1,6 @@
 // broadcast package
-// code from dotcloud/docker
-package main
+// some code from dotcloud/docker
+package utils
 
 import (
 	"bytes"
@@ -40,6 +40,10 @@ func (w *WriteBroadcaster) AddWriter(writer io.WriteCloser, stream string) {
 	}
 	sw := StreamWriter{wc: writer, stream: stream}
 	w.writers[sw] = true
+}
+
+func (wb *WriteBroadcaster) Closed() bool {
+	return wb.closed
 }
 
 func (wb *WriteBroadcaster) NewReader(name string) ([]byte, *io.PipeReader) {

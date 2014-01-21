@@ -14,12 +14,13 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/jessevdk/go-flags"
+	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/klog"
 )
 
 var (
 	mu         = &sync.Mutex{}
-	broadcasts = make(map[string]*WriteBroadcaster)
+	broadcasts = make(map[string]*utils.WriteBroadcaster)
 	totalUser  = 0
 
 	lg = klog.DevLog
@@ -28,7 +29,7 @@ var (
 	Arch = []string{"386", "amd64"}
 )
 
-func startCommand(wr *WriteBroadcaster, arg0 string, args ...string) {
+func startCommand(wr *utils.WriteBroadcaster, arg0 string, args ...string) {
 	// start to run build command
 	cmd := exec.Command(arg0, args...)
 	cmd.Stdout = wr
@@ -36,7 +37,7 @@ func startCommand(wr *WriteBroadcaster, arg0 string, args ...string) {
 	go func() {
 		err := cmd.Run()
 		if err != nil {
-			Debugf("start cmd error: %v", err)
+			utils.Debugf("start cmd error: %v", err)
 			io.WriteString(wr, "\nERROR: "+err.Error())
 		}
 		wr.CloseWriters()
@@ -57,15 +58,15 @@ func NewProject(addr, name string) *Project {
 	mu.Lock()
 	defer mu.Unlock()
 	if broadcasts[addr] == nil {
-		writer := NewWriteBroadcaster()
+		writer := utils.NewWriteBroadcaster()
 		broadcasts[addr] = writer
 		startCommand(writer, "./autobuild", addr)
 	}
 	bc := broadcasts[addr]
 
-	Debugf("%s: lock 2.2 new reader done", name)
+	utils.Debugf("%s: lock 2.2 new reader done", name)
 	bufbytes, rd := bc.NewReader(name)
-	reader := NewBufReader(rd)
+	reader := utils.NewBufReader(rd)
 	return &Project{
 		BufferStr: string(bufbytes),
 		Reader:    reader,
@@ -83,7 +84,7 @@ func WsBuildServer(ws *websocket.Conn) {
 	var err error
 	clientMsg := new(Message)
 	if err = websocket.JSON.Receive(ws, &clientMsg); err != nil {
-		Debugf("read json error: %v", err)
+		utils.Debugf("read json error: %v", err)
 		return
 	}
 	addr := clientMsg.Data
@@ -98,7 +99,7 @@ func WsBuildServer(ws *websocket.Conn) {
 	}
 	err = websocket.JSON.Send(ws, firstMsg)
 	if err != nil {
-		Debugf("send first msg error: %v", err)
+		utils.Debugf("send first msg error: %v", err)
 		return
 	}
 

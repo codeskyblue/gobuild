@@ -1,5 +1,5 @@
 // broadcast_test.go
-package main
+package utils
 
 import (
 	"io"

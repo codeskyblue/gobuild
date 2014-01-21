@@ -46,7 +46,7 @@ func InitRouter() {
 		if br == nil {
 			return
 		}
-		if br.closed {
+		if br.Closed() {
 			lg.Debug("rebuild:", addr)
 			delete(broadcasts, addr)
 		}
