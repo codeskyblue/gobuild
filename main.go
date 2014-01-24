@@ -125,7 +125,12 @@ func WsBuildServer(ws *websocket.Conn) {
 }
 
 var (
-	options struct {
+	opts struct {
+		ConfigFile string `short:"f" long:"file" description:"configuration file" default:"app.ini"`
+
+		ListenAddr string `short:"l" long:"listen" description:"server listen address" default:":3000"`
+		Hostname   string `short:"H" long:"host" description:"hostname like gobuild.io" default:"localhost"`
+
 		Server   string `short:"s" long:"serverAddr"`
 		WsServer string `short:"w" long:"wsAddr"`
 		CDN      string `short:"c" long:"cdn"`
@@ -136,23 +141,30 @@ var (
 )
 
 func parseConfig() (err error) {
-	parser := flags.NewParser(&options, flags.Default)
-	err = flags.NewIniParser(parser).ParseFile("app.ini")
+	parser := flags.NewParser(&opts, flags.Default)
+	args, err = flags.Parse(&opts)
 	if err != nil {
 		return
 	}
-	args, err = flags.Parse(&options)
+	err = flags.NewIniParser(parser).ParseFile(opts.ConfigFile)
 	if err != nil {
 		return
 	}
-	if options.CDN == "" {
-		options.CDN = "http://" + options.Server + "/files"
+
+	// change to localhost:port
+	if opts.Hostname == "localhost" {
+		opts.Hostname += opts.ListenAddr[strings.Index(opts.ListenAddr, ":"):]
 	}
-	if options.WsServer == "" {
-		options.WsServer = "ws://" + options.Server
+
+	// FIXME: below code need to be deleted
+	if opts.CDN == "" {
+		opts.CDN = "http://" + opts.Server + "/files"
 	}
-	sepIndex := strings.Index(options.Server, ":")
-	listenAddr = options.Server[sepIndex:]
+	if opts.WsServer == "" {
+		opts.WsServer = "ws://" + opts.Server
+	}
+	sepIndex := strings.Index(opts.Server, ":")
+	listenAddr = opts.Server[sepIndex:]
 	return err
 }
 
@@ -173,8 +185,8 @@ func main() {
 	}
 	lg.Info("gobuild service stated ...")
 	fmt.Println("\tlisten address:", listenAddr)
-	fmt.Println("\twebsocket addr:", options.WsServer)
-	fmt.Println("\tCDN:", options.CDN)
+	fmt.Println("\twebsocket addr:", opts.WsServer)
+	fmt.Println("\tCDN:", opts.CDN)
 
 	http.Handle("/", m)
 	http.Handle("/websocket", websocket.Handler(WsBuildServer))

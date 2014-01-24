@@ -66,9 +66,9 @@ func InitRouter() {
 		r.HTML(200, "build", map[string]string{
 			"FullName":       addr,
 			"Name":           filepath.Base(addr),
-			"DownloadPrefix": options.CDN,
-			"Server":         options.Server,
-			"WsServer":       options.WsServer + "/websocket",
+			"DownloadPrefix": opts.CDN,
+			"Server":         opts.Server,
+			"WsServer":       opts.WsServer + "/websocket",
 			"JsDir":          jsDir,
 		})
 	})
@@ -129,7 +129,7 @@ func InitRouter() {
 			return 500, err.Error()
 		}
 		// path like: cdn://project/sha/os_arch/filename
-		r.Redirect(options.CDN+"/"+filepath.Join(project, sha, os+"_"+arch, filename), 302)
+		r.Redirect(opts.CDN+"/"+filepath.Join(project, sha, os+"_"+arch, filename), 302)
 		return
 	})
 
@@ -143,8 +143,8 @@ func InitRouter() {
 		buf := bytes.NewBuffer(nil)
 		err = t.Execute(buf, map[string]interface{}{
 			"Project": project,
-			"Server":  options.Server,
-			//"CDN":     options.CDN,
+			"Server":  opts.Server,
+			//"CDN":     opts.CDN,
 		})
 		if err != nil {
 			lg.Error(err)
@@ -160,7 +160,7 @@ func InitRouter() {
 		files := []string{}
 		for _, os := range OS {
 			for _, arch := range Arch {
-				outfile := fmt.Sprintf("%s/%s/%s_%s_%s", options.CDN, addr, basename, os, arch)
+				outfile := fmt.Sprintf("%s/%s/%s_%s_%s", opts.CDN, addr, basename, os, arch)
 				if os == "windows" {
 					outfile += ".exe"
 				}
@@ -169,9 +169,9 @@ func InitRouter() {
 		}
 		r.HTML(200, "download", map[string]interface{}{
 			"Project": addr,
-			"Server":  options.Server,
+			"Server":  opts.Server,
 			"Name":    filepath.Base(addr),
-			"CDN":     options.CDN,
+			"CDN":     opts.CDN,
 			"Files":   files,
 		})
 	})
