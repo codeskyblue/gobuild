@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -14,12 +16,48 @@ import (
 )
 
 func InitRouter() {
+	var p2id = make(map[string]string)
+	var GOROOT = "/Users/skyblue/go"
+
 	m.Get("/", func(r render.Render) {
 		r.HTML(200, "index", nil)
 	})
-	m.Get("/github.com/**", func(params martini.Params, r render.Render) {
+	m.Get("/github.com/:account/:proj/:ref/:os/:arch", func(p martini.Params) string {
+		var err error
+		var id = "uuid" // FIXME
+		// create log
+		outfd, err := os.OpenFile("log/"+id, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+		if err != nil {
+			lg.Error(err)
+		}
+		defer outfd.Close()
+		// build cmd
+		cmd := exec.Command("bin/build", "github.com/"+p["account"]+"/"+p["proj"])
+		envs := []string{}
+		for k, v := range p {
+			envs = append(envs, strings.ToUpper(k)+"="+v)
+		}
+		url := strings.Join(envs, "/")
+		envs = append(envs, "GOROOT="+GOROOT, "BUILD_HOST="+"127.0.0.1:3000", "BUILD_ID="+id)
+		cmd.Env = envs
+		cmd.Stdout = outfd
+		cmd.Stderr = outfd
+
+		p2id[url] = id
+		err = cmd.Run()
+		return ""
+	})
+
+	m.Get("/info/:id/output", func(p martini.Params) string {
+		return "unfinished"
+	})
+	m.Get("/api/:id/finish", func(p martini.Params) string {
+		return "unfinished"
+	})
+	/*m.Get("/github.com/**", func(params martini.Params, r render.Render) {
 		r.Redirect("/download/github.com/"+params["_1"], 302)
 	})
+	*/
 
 	m.Get("/build/**", func(params martini.Params, r render.Render) {
 		addr := params["_1"]
