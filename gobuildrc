@@ -1,0 +1,11 @@
+---
+folder:
+	- public
+	- static
+	- css
+	- js
+exclude:
+	- .svn
+	- .git
+flags:
+	- -W -N

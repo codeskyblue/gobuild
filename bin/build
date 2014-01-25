@@ -5,6 +5,7 @@ set -o pipefail
 
 export PATH="/usr/local/bin:/usr/bin:/bin:$GOROOT/bin"
 
+set -x
 # args
 PROJECT=$1
 echo "Project $PROJECT"
@@ -12,11 +13,10 @@ echo "Project $PROJECT"
 # determine root
 root=$(cd $(dirname $0); pwd)
 
-gopath=$(mktemp -d tmp/goroot_XXXX)
-echo "Created GOPATH($gopath)"
-trap 'echo Cleaning; rm -fr $gopath' EXIT
+echo "Creating GOPATH"
+gopath=$(mktemp -d $root/goroot_XXXX)
 export GOPATH="$gopath"
-
+trap 'echo Cleaning; rm -fr $gopath' EXIT
 
 echo "Downlaoding $PROJECT"
 go get -d "$PROJECT"
@@ -28,11 +28,17 @@ if [[ ! -z $REF ]]; then
 	git checkout $REF
 fi
 
-echo "Setting version to $VERSION"
+# set up godeps
+if [ -f Godeps ]; then
+	go get github.com/kr/godep
+	alias go="$GOPATH/bin/godep go"
+fi
+
+#echo "Setting version to $VERSION"
 # FIXME: todo
 
 echo "Compiling"
-go install
+go get .
 
 if [ -d $GOPATH/bin/${GOOS}_${GOARCH} ]; then
 	BINARY="$(ls -1 $GOPATH/bin/${GOOS}_${GOARCH}/$(echo $PROJECT | cut -d/ -f3)*)"
@@ -40,8 +46,5 @@ else
 	BINARY="$GOPATH/bin/$(echo $PROJECT | cut -d/ -f3)"
 fi
 
-echo "Uploading binary(FIXME)"
-#addr=$(cat "$root/app.ini" | grep "^serverAddr" | awk -F: '{print "127.0.0.1:" $2}' | xargs echo -n)
-#curl -s -d "p=$path" -d "sha=$SHA" $addr/api/update
-curl $BUILD_HOST/api/$BUILD_ID/finish
-
+echo "Uploading binary"
+curl -X POST -T "$BINARY" $BUILD_HOST/api/$BUILD_ID/binary

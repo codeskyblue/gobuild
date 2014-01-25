@@ -3,28 +3,50 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
+	"time"
 
+	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/shxsun/gobuild/models"
 )
 
+// upload a file and return a address
+// FIXME: need to support qiniu
+func uploadFile(reader io.Reader) (addr string, err error) {
+	f, err := ioutil.TempFile("files", "upload-")
+	if err != nil {
+		return
+	}
+	_, err = io.Copy(f, reader)
+	if err != nil {
+		return
+	}
+	addr = "http://" + opts.Hostname + f.Name()
+	return
+}
+
 func InitRouter() {
 	var p2id = make(map[string]string)
-	var GOROOT = "/Users/skyblue/go"
+	var scribe = make(map[string]chan string)
+	var GOROOT = opts.GOROOT
 
 	m.Get("/", func(r render.Render) {
 		r.HTML(200, "index", nil)
 	})
-	m.Get("/github.com/:account/:proj/:ref/:os/:arch", func(p martini.Params) string {
+	m.Get("/github.com/:account/:proj/:ref/:goos/:goarch", func(p martini.Params) string {
 		var err error
-		var id = "uuid" // FIXME
+		var id = uuid.New()
+		ch := make(chan string, 1)
+		scribe[id] = ch
 		// create log
 		outfd, err := os.OpenFile("log/"+id, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 		if err != nil {
@@ -38,22 +60,46 @@ func InitRouter() {
 			envs = append(envs, strings.ToUpper(k)+"="+v)
 		}
 		url := strings.Join(envs, "/")
-		envs = append(envs, "GOROOT="+GOROOT, "BUILD_HOST="+"127.0.0.1:3000", "BUILD_ID="+id)
+		envs = append(envs,
+			"GOROOT="+GOROOT,
+			"BUILD_HOST="+"127.0.0.1:3000",
+			"BUILD_ID="+id)
 		cmd.Env = envs
 		cmd.Stdout = outfd
 		cmd.Stderr = outfd
 
 		p2id[url] = id
 		err = cmd.Run()
-		return ""
+		if err != nil {
+			return err.Error()
+		}
+
+		var message string
+		select {
+		case message = <-ch:
+		case <-time.After(time.Second * 1):
+			message = "timeout"
+		}
+		lg.Info("finish build:", url, message)
+		return message
 	})
 
 	m.Get("/info/:id/output", func(p martini.Params) string {
 		return "unfinished"
 	})
-	m.Get("/api/:id/finish", func(p martini.Params) string {
+	m.Post("/api/:id/binary", func(r *http.Request, p martini.Params) string {
+		addr, err := uploadFile(r.Body)
+		if err != nil {
+			lg.Error(err)
+		}
+		fmt.Println(addr)
+		if ch := scribe[p["id"]]; ch != nil {
+			ch <- "done"
+			close(ch)
+		}
 		return "unfinished"
 	})
+
 	/*m.Get("/github.com/**", func(params martini.Params, r render.Render) {
 		r.Redirect("/download/github.com/"+params["_1"], 302)
 	})

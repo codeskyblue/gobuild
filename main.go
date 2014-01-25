@@ -130,6 +130,7 @@ var (
 
 		ListenAddr string `short:"l" long:"listen" description:"server listen address" default:":3000"`
 		Hostname   string `short:"H" long:"host" description:"hostname like gobuild.io" default:"localhost"`
+		GOROOT     string `short:"r" long:"goroot" description:"set GOROOT path"`
 
 		Server   string `short:"s" long:"serverAddr"`
 		WsServer string `short:"w" long:"wsAddr"`
@@ -144,6 +145,7 @@ func parseConfig() (err error) {
 	parser := flags.NewParser(&opts, flags.Default)
 	args, err = flags.Parse(&opts)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	err = flags.NewIniParser(parser).ParseFile(opts.ConfigFile)
