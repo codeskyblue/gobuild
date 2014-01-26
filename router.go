@@ -3,8 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -19,30 +17,14 @@ import (
 	"github.com/shxsun/gobuild/models"
 )
 
-// upload a file and return a address
-// FIXME: need to support qiniu
-func uploadFile(reader io.Reader) (addr string, err error) {
-	f, err := ioutil.TempFile("files", "upload-")
-	if err != nil {
-		return
-	}
-	_, err = io.Copy(f, reader)
-	if err != nil {
-		return
-	}
-	addr = "http://" + opts.Hostname + f.Name()
-	return
-}
-
 func InitRouter() {
-	var p2id = make(map[string]string)
 	var scribe = make(map[string]chan string)
 	var GOROOT = opts.GOROOT
 
 	m.Get("/", func(r render.Render) {
 		r.HTML(200, "index", nil)
 	})
-	m.Get("/github.com/:account/:proj/:ref/:goos/:goarch", func(p martini.Params) string {
+	m.Get("/github.com/:account/:proj/:ref/:goos/:goarch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
 		var err error
 		var id = uuid.New()
 		ch := make(chan string, 1)
@@ -59,7 +41,6 @@ func InitRouter() {
 		for k, v := range p {
 			envs = append(envs, strings.ToUpper(k)+"="+v)
 		}
-		url := strings.Join(envs, "/")
 		envs = append(envs,
 			"GOROOT="+GOROOT,
 			"BUILD_HOST="+"127.0.0.1:3000",
@@ -68,10 +49,10 @@ func InitRouter() {
 		cmd.Stdout = outfd
 		cmd.Stderr = outfd
 
-		p2id[url] = id
 		err = cmd.Run()
 		if err != nil {
-			return err.Error()
+			lg.Error(err)
+			return
 		}
 
 		var message string
@@ -80,24 +61,25 @@ func InitRouter() {
 		case <-time.After(time.Second * 1):
 			message = "timeout"
 		}
-		lg.Info("finish build:", url, message)
-		return message
+		lg.Info("finish build:", message)
+		http.Redirect(w, r, message, http.StatusTemporaryRedirect)
+		return
 	})
 
 	m.Get("/info/:id/output", func(p martini.Params) string {
 		return "unfinished"
 	})
-	m.Post("/api/:id/binary", func(r *http.Request, p martini.Params) string {
+	m.Post("/api/:id/binary", func(w http.ResponseWriter, r *http.Request, p martini.Params) string {
 		addr, err := uploadFile(r.Body)
 		if err != nil {
 			lg.Error(err)
 		}
 		fmt.Println(addr)
 		if ch := scribe[p["id"]]; ch != nil {
-			ch <- "done"
+			ch <- addr
 			close(ch)
 		}
-		return "unfinished"
+		return "finished:" + addr
 	})
 
 	/*m.Get("/github.com/**", func(params martini.Params, r render.Render) {

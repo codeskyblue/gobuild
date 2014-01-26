@@ -185,10 +185,8 @@ func main() {
 	if err = parseConfig(); err != nil {
 		return
 	}
+	utils.Dump(opts)
 	lg.Info("gobuild service stated ...")
-	fmt.Println("\tlisten address:", listenAddr)
-	fmt.Println("\twebsocket addr:", opts.WsServer)
-	fmt.Println("\tCDN:", opts.CDN)
 
 	http.Handle("/", m)
 	http.Handle("/websocket", websocket.Handler(WsBuildServer))

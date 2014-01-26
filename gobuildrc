@@ -1,9 +1,9 @@
 ---
 filesets:
-    - includes:
+    includes:
         - public
         - static
         - README.*
         - LICENCE
-    - exclude:
+    excludes:
         - .svn

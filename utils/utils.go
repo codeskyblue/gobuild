@@ -3,9 +3,11 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
+
+	"launchpad.net/goyaml"
 )
-import "log"
 
 func Debugf(format string, a ...interface{}) {
 	if false {
@@ -27,4 +29,9 @@ func GoTimeout(f func() error, timeout time.Duration) (err error) {
 	case <-done:
 		return
 	}
+}
+
+func Dump(a interface{}) {
+	out, _ := goyaml.Marshal(a)
+	fmt.Println(string(out))
 }
