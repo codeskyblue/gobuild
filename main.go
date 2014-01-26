@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os/exec"
 	"strings"
 	"sync"
 	"time"
@@ -21,7 +20,8 @@ import (
 var (
 	mu         = &sync.Mutex{}
 	broadcasts = make(map[string]*utils.WriteBroadcaster)
-	totalUser  = 0
+	//joblist    = make(map[string]*Job)
+	totalUser = 0
 
 	lg = klog.DevLog
 
@@ -29,25 +29,10 @@ var (
 	Arch = []string{"386", "amd64"}
 )
 
-func startCommand(wr *utils.WriteBroadcaster, arg0 string, args ...string) {
-	// start to run build command
-	cmd := exec.Command(arg0, args...)
-	cmd.Stdout = wr
-	cmd.Stderr = wr
-	go func() {
-		err := cmd.Run()
-		if err != nil {
-			utils.Debugf("start cmd error: %v", err)
-			io.WriteString(wr, "\nERROR: "+err.Error())
-		}
-		wr.CloseWriters()
-	}()
-}
-
 type Project struct {
-	Channel   chan string
 	BufferStr string
 	Reader    io.ReadCloser
+	job       *Job
 }
 
 func (p *Project) Close() {
@@ -57,15 +42,16 @@ func (p *Project) Close() {
 func NewProject(addr, name string) *Project {
 	mu.Lock()
 	defer mu.Unlock()
-	if broadcasts[addr] == nil {
-		writer := utils.NewWriteBroadcaster()
-		broadcasts[addr] = writer
-		startCommand(writer, "./autobuild", addr)
-	}
-	bc := broadcasts[addr]
+	var wc *utils.WriteBroadcaster
+	if wc = broadcasts[addr]; wc == nil {
+		wc = utils.NewWriteBroadcaster()
+		broadcasts[addr] = wc
 
-	utils.Debugf("%s: lock 2.2 new reader done", name)
-	bufbytes, rd := bc.NewReader(name)
+		// start compiling job
+		go NewJob(addr, wc).Auto()
+	}
+
+	bufbytes, rd := wc.NewReader(name)
 	reader := utils.NewBufReader(rd)
 	return &Project{
 		BufferStr: string(bufbytes),
