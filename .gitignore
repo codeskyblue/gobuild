@@ -21,6 +21,5 @@ _testmain.go
 
 *.exe
 files/**
-log/**
 gobuild
 sqlite.db
