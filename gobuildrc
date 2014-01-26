@@ -1,11 +1,9 @@
 ---
-folder:
-	- public
-	- static
-	- css
-	- js
-exclude:
-	- .svn
-	- .git
-flags:
-	- -W -N
+filesets:
+    - includes:
+        - public
+        - static
+        - README.*
+        - LICENCE
+    - exclude:
+        - .svn
