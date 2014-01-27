@@ -16,25 +16,23 @@ type Dir string
 
 type Session struct {
 	inj    inject.Injector
+	Env    map[string]string
 	Output io.Writer
 }
 
 func NewSession(a ...interface{}) *Session {
+	env := map[string]string{
+		"PATH": "/bin:/usr/bin:/usr/local/bin",
+	}
 	s := &Session{
 		inj:    inject.New(),
 		Output: os.Stdout,
-	}
-	env := map[string]string{
-		"PATH": "/bin:/usr/bin:/usr/local/bin",
+		Env:    env,
 	}
 	dir := Dir("")
 	args := []string{}
 	s.inj.Map(env).Map(dir).Map(args)
 	for _, v := range a {
-		if writer, ok := v.(*io.Writer); ok {
-			s.inj.MapTo(writer, (*io.Writer)(nil))
-			continue
-		}
 		s.inj.Map(v)
 	}
 	return s
@@ -55,9 +53,9 @@ func (s *Session) Call(a ...interface{}) error {
 	return r.Interface().(error)
 }
 
-func (s *Session) invokeExec(cmd string, args []string, env map[string]string, cwd Dir) error {
-	envs := make([]string, 0, len(env))
-	for k, v := range env {
+func (s *Session) invokeExec(cmd string, args []string, cwd Dir) error {
+	envs := make([]string, 0, len(s.Env))
+	for k, v := range s.Env {
 		envs = append(envs, k+"="+v)
 	}
 	//fmt.Println(cmd, args)

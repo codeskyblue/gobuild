@@ -3,53 +3,23 @@
 
 echo ARGS:"$#" "$@"
 PS4='$ '
-export PATH=/bin:/usr/bin:/usr/local/bin:$GOPATH/bin:$HOME/bin:$PATH
+#export PATH=/bin:/usr/bin:/usr/local/bin:$GOPATH/bin:$HOME/bin:$PATH
 
 CURDIR=$(cd $(dirname $0); pwd)
 
+go version
 export
-#export GOPATH=$CURDIR/project
-#mkdir -p $GOPATH/{src,bin}
-#export GOBIN=$CURDIR/files
-
-addr=$1
-case "$addr" in
-	github.com/*)
-		addr="https://$addr"
-		;;
-	git.oschina.net/*)
-		addr="http://$addr"
-		;;
-esac
-
-path=${1%.git}
-path=${path#https://}
-path=${path#http://}
 
 export GOBIN="$GOBIN/${path}"
 
-cd "$GOPATH/src"
-if test -d "$path"
-then
-	cd "${path}"
-	set -eu -x # open debug
-	git pull </dev/null|| exit 2
-else
-	TIMEOUT=30s
-	#echo "git clone: timeout $TIMEOUT"
-	#timeout $TIMEOUT 
-	set -eu -x # open debug
-	git clone "$addr" "${path}" || exit 1
-	cd "${path}"
-fi
+set -eu -x # open debug
+cd "$GOPATH/src/$PROJECT"
 	
-go version
 SHA=$(git rev-parse HEAD)
 go get -u -v
 CGO_ENABLED=0 go build
-gox '-os=linux windows darwin' '-arch=amd64 386' -output="$CURDIR/files/$path/$SHA/{{.OS}}_{{.Arch}}/{{.Dir}}"
+gox '-os=linux windows darwin' '-arch=amd64 386' -output="$CURDIR/files/$PROJECT/$SHA/{{.OS}}_{{.Arch}}/{{.Dir}}"
 
-set +x
 addr=$(cat "$CURDIR/app.ini" | grep "^serverAddr" | awk -F: '{print "127.0.0.1:" $2}' | xargs echo -n)
-curl -s -d "p=$path" -d "sha=$SHA" $addr/api/update
+curl -s -d "p=$PROJECT" -d "sha=$SHA" $addr/api/update
 
