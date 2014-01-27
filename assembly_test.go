@@ -12,5 +12,9 @@ filesets:
 `
 
 func TestPackage(t *testing.T) {
-	Package("gobuildrc")
+	addr, err := Package([]string{"README.md"}, "gobuildrc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(addr)
 }

@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	beeutils "github.com/astaxie/beego/utils"
+	"github.com/shxsun/gobuild/models"
 	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/gobuild/xsh"
 )
@@ -117,12 +118,17 @@ func (j *Job) Auto() (err error) {
 		return
 	}
 	fmt.Println(file)
-	return j.pkg()
+	if err = j.pkg(); err != nil {
+		return
+	}
 
-	//err = j.sh.Call("./autobuild", []string{j.project}, xsh.Dir(""))
-	//if err != nil {
-	//	utils.Debugf("start cmd error: %v", err)
-	//	io.WriteString(j.wbc, "\nERROR: "+err.Error())
-	//}
-	//return
+	// save to db
+	p := new(models.Project)
+	p.Name = j.project
+	p.Ref = "master" // TODO
+	err = models.SyncProject(p)
+	if err != nil {
+		return
+	}
+	return j.pkg()
 }

@@ -1,7 +1,6 @@
 ---
 filesets:
     includes:
-        - public
         - static
         - README.*
         - LICENCE

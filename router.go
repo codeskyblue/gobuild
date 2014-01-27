@@ -70,11 +70,14 @@ func InitRouter() {
 		return "unfinished"
 	})
 	m.Post("/api/:id/binary", func(w http.ResponseWriter, r *http.Request, p martini.Params) string {
-		addr, err := uploadFile(r.Body)
-		if err != nil {
-			lg.Error(err)
-		}
-		fmt.Println(addr)
+		addr := "xyz-xxxx"
+		/*
+			addr, err := uploadFile(r.Body)
+			if err != nil {
+				lg.Error(err)
+			}
+			fmt.Println(addr)
+		*/
 		if ch := scribe[p["id"]]; ch != nil {
 			ch <- addr
 			close(ch)
