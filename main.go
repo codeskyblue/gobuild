@@ -48,7 +48,12 @@ func NewProject(addr, name string) *Project {
 		broadcasts[addr] = wc
 
 		// start compiling job
-		go NewJob(addr, wc).Auto()
+		go func() {
+			err := NewJob(addr, wc).Auto()
+			if err != nil {
+				lg.Error(err)
+			}
+		}()
 	}
 
 	bufbytes, rd := wc.NewReader(name)

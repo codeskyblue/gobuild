@@ -1,14 +1,16 @@
 #!/bin/bash -
 #
 
+echo ARGS:"$#" "$@"
 PS4='$ '
 export PATH=/bin:/usr/bin:/usr/local/bin:$GOPATH/bin:$HOME/bin:$PATH
 
 CURDIR=$(cd $(dirname $0); pwd)
 
-export GOPATH=$CURDIR/project
-mkdir -p $GOPATH/{src,bin}
-export GOBIN=$CURDIR/files
+export
+#export GOPATH=$CURDIR/project
+#mkdir -p $GOPATH/{src,bin}
+#export GOBIN=$CURDIR/files
 
 addr=$1
 case "$addr" in

@@ -15,21 +15,21 @@ func Call(a ...interface{}) error {
 type Dir string
 
 type Session struct {
-	inj inject.Injector
+	inj    inject.Injector
+	Output io.Writer
 }
 
 func NewSession(a ...interface{}) *Session {
 	s := &Session{
-		inj: inject.New(),
+		inj:    inject.New(),
+		Output: os.Stdout,
 	}
 	env := map[string]string{
 		"PATH": "/bin:/usr/bin:/usr/local/bin",
 	}
 	dir := Dir("")
 	args := []string{}
-	s.inj.Map(env).Map(dir).Map(args).Map(os.Stdout)
-	//s.inj.MapTo(os.Stdout, (*io.Writer)(nil))
-	//fmt.Println(reflect.ValueOf((*io.Writer)(os.Stdout)).Type())
+	s.inj.Map(env).Map(dir).Map(args)
 	for _, v := range a {
 		if writer, ok := v.(*io.Writer); ok {
 			s.inj.MapTo(writer, (*io.Writer)(nil))
@@ -44,7 +44,7 @@ func (s *Session) Call(a ...interface{}) error {
 	for _, v := range a {
 		s.inj.Map(v)
 	}
-	values, err := s.inj.Invoke(invokeExec)
+	values, err := s.inj.Invoke(s.invokeExec)
 	if err != nil {
 		return err
 	}
@@ -55,15 +55,16 @@ func (s *Session) Call(a ...interface{}) error {
 	return r.Interface().(error)
 }
 
-func invokeExec(cmd string, args []string, env map[string]string, cwd Dir, output *os.File) error {
+func (s *Session) invokeExec(cmd string, args []string, env map[string]string, cwd Dir) error {
 	envs := make([]string, 0, len(env))
 	for k, v := range env {
 		envs = append(envs, k+"="+v)
 	}
+	//fmt.Println(cmd, args)
 	c := exec.Command(cmd, args...)
 	c.Env = envs
 	c.Dir = string(cwd)
-	c.Stdout = output
-	c.Stderr = output
+	c.Stdout = s.Output
+	c.Stderr = s.Output
 	return c.Run()
 }
