@@ -73,6 +73,7 @@ func (b *Job) init() (err error) {
 
 // download src
 func (b *Job) get() (err error) {
+	b.sh.Call("echo", []string{"downloading src"})
 	err = b.sh.Call("go", []string{"get", "-v", "-d", b.project})
 	if err != nil {
 		return
@@ -117,9 +118,6 @@ func (j *Job) build(os, arch string) (file string, err error) {
 
 // achieve and upload
 func (b *Job) pkg(bins []string) (addr string, err error) {
-	//args := []string{"-os=linux windows darwin", "-arch=amd64 386"}
-	//args = append(args, "-output="+"$CURDIR/files/$PROJECT/$SHA/{{.OS}}_{{.Arch}}/{{.Dir}}")
-	//return j.sh.Call("gox", args)
 	return Package(bins, filepath.Join(b.srcDir, ".build"))
 }
 
@@ -132,6 +130,7 @@ func (b *Job) clean() (err error) {
 
 // init + build + pkg + clean
 func (j *Job) Auto() (addr string, err error) {
+	defer j.wbc.CloseWriters()
 	if err = j.init(); err != nil {
 		return
 	}
@@ -141,8 +140,12 @@ func (j *Job) Auto() (addr string, err error) {
 		if er != nil {
 			lg.Warn(er)
 		}
-		j.wbc.CloseWriters()
 	}()
+	// download src
+	err = j.get()
+	if err != nil {
+		return
+	}
 	// build xc
 	file, err := j.build("linux", "amd64")
 	if err != nil {

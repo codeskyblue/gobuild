@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -35,12 +34,6 @@ func uploadFile(file string) (addr string, err error) {
 	exec.Command("cp", "-f", file, f.Name()).Run()
 	addr = "http://" + filepath.Join(opts.Hostname, f.Name())
 	return
-}
-
-func achieveZip(target string, files ...string) (err error) {
-	fmt.Println("target =", target)
-	fmt.Println(files)
-	return nil
 }
 
 // basic regrex match
@@ -78,13 +71,19 @@ func pkgZip(root string, files []string) (addr string, err error) {
 		if er != nil {
 			continue
 		}
+		lg.Debug("add", save, f)
 		if info.IsDir() {
-			z.AddDir(save, f)
+			if err = z.AddDir(save, f); err != nil {
+				return
+			}
 		} else {
-			z.AddFile(save, f)
+			if err = z.AddFile(save, f); err != nil {
+				return
+			}
 		}
 	}
 	if err = z.Close(); err != nil {
+		lg.Error(err)
 		return
 	}
 	return uploadFile(tmpFile.Name())
@@ -92,19 +91,30 @@ func pkgZip(root string, files []string) (addr string, err error) {
 
 // package according .gobuild, return a download url
 // format: <tgz|zip>
+var defaultRc = `---
+filesets:
+    includes:
+        - static
+        - README.*
+        - LICENCE
+    excludes:
+        - .svn
+`
+
 func Package(bins []string, rcfile string) (addr string, err error) {
+	lg.Debug(bins)
 	data, err := ioutil.ReadFile(rcfile)
 	if err != nil {
-		return
+		lg.Debug("use default rc")
+		data = []byte(defaultRc)
 	}
-	fmt.Println(string(data))
 	ass := new(Assembly)
 	err = goyaml.Unmarshal(data, ass)
 	if err != nil {
 		return
 	}
 	dir := filepath.Dir(rcfile)
-	fmt.Println(dir, ass)
+	//fmt.Println(dir, ass)
 	fs, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return

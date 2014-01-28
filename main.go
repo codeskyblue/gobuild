@@ -80,7 +80,7 @@ func WsBuildServer(ws *websocket.Conn) {
 	}
 	addr := clientMsg.Data
 	name := ws.RemoteAddr().String()
-	lg.Debug("handle request project:", addr, name)
+	lg.Debug(addr, name)
 
 	proj := NewProject(addr, name)
 	defer proj.Close()
@@ -112,7 +112,6 @@ func WsBuildServer(ws *websocket.Conn) {
 			return
 		}
 	}
-	lg.Debug(addr, "loop ends")
 }
 
 var (
