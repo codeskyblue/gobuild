@@ -1,15 +1,40 @@
 package xsh
 
 import (
+	"bytes"
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/codegangsta/inject"
 )
 
-func Call(a ...interface{}) error {
-	return NewSession().Call(a...)
+type Return struct {
+	Stdout   string
+	Stderr   string
+	Exitcode int
+}
+
+func (r *Return) String() string {
+	return r.Stdout
+}
+
+func (r *Return) Trim() string {
+	return strings.TrimSpace(r.Stdout)
+}
+
+func Call(name string, args ...string) (ret *Return, err error) {
+	stdout := new(bytes.Buffer)
+	stderr := new(bytes.Buffer)
+	cmd := exec.Command(name, args...)
+	cmd.Stdout, cmd.Stderr = stdout, stderr
+	ret = new(Return)
+	//ret.Error
+	err = cmd.Run()
+	ret.Stdout = string(stdout.Bytes())
+	ret.Stderr = string(stderr.Bytes())
+	return
 }
 
 type Dir string

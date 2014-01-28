@@ -3,10 +3,11 @@ package xsh
 import "testing"
 
 func TestCall(t *testing.T) {
-	err := Call("echo", []string{"a", "b"})
+	ret, err := Call("echo", "hello")
 	if err != nil {
 		t.Error(err)
 	}
+	t.Log(ret.Trim())
 }
 
 func TestSession(t *testing.T) {
