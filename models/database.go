@@ -18,11 +18,12 @@ var (
 )
 
 type Project struct {
-	Name    string
-	Ref     string
-	Uuid    string
-	Mtime   string
-	Address string
+	Name      string //`xorm:"unique(p)"`
+	Uuid      string //`xorm:"unique(p)"`
+	Ref       string
+	Mtime     string
+	Address   string
+	ViewCount int
 
 	Project string `xorm:"pk"`
 	Sha     string

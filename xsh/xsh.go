@@ -11,9 +11,8 @@ import (
 )
 
 type Return struct {
-	Stdout   string
-	Stderr   string
-	Exitcode int
+	Stdout string
+	Stderr string
 }
 
 func (r *Return) String() string {
@@ -24,14 +23,14 @@ func (r *Return) Trim() string {
 	return strings.TrimSpace(r.Stdout)
 }
 
-func Call(name string, args ...string) (ret *Return, err error) {
+func Capture(a ...interface{}) (ret *Return, err error) {
+	s := NewSession(a...)
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	cmd := exec.Command(name, args...)
-	cmd.Stdout, cmd.Stderr = stdout, stderr
+	s.Stdout, s.Stderr = stdout, stderr
+	err = s.Call()
+
 	ret = new(Return)
-	//ret.Error
-	err = cmd.Run()
 	ret.Stdout = string(stdout.Bytes())
 	ret.Stderr = string(stderr.Bytes())
 	return
@@ -42,7 +41,8 @@ type Dir string
 type Session struct {
 	inj    inject.Injector
 	Env    map[string]string
-	Output io.Writer
+	Stdout io.Writer
+	Stderr io.Writer
 }
 
 func NewSession(a ...interface{}) *Session {
@@ -51,7 +51,8 @@ func NewSession(a ...interface{}) *Session {
 	}
 	s := &Session{
 		inj:    inject.New(),
-		Output: os.Stdout,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
 		Env:    env,
 	}
 	dir := Dir("")
@@ -87,7 +88,7 @@ func (s *Session) invokeExec(cmd string, args []string, cwd Dir) error {
 	c := exec.Command(cmd, args...)
 	c.Env = envs
 	c.Dir = string(cwd)
-	c.Stdout = s.Output
-	c.Stderr = s.Output
+	c.Stdout = s.Stdout
+	c.Stderr = s.Stdout
 	return c.Run()
 }
