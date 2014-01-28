@@ -116,22 +116,22 @@ func (j *Job) build(os, arch string) (file string, err error) {
 }
 
 // achieve and upload
-func (j *Job) pkg() error {
+func (b *Job) pkg(bins []string) (addr string, err error) {
 	//args := []string{"-os=linux windows darwin", "-arch=amd64 386"}
 	//args = append(args, "-output="+"$CURDIR/files/$PROJECT/$SHA/{{.OS}}_{{.Arch}}/{{.Dir}}")
 	//return j.sh.Call("gox", args)
-	return nil
+	return Package(bins, filepath.Join(b.srcDir, ".build"))
 }
 
 // remove tmp file
-func (j *Job) clean() (err error) {
-	j.sh.Call("echo", []string{"cleaning..."})
-	err = os.RemoveAll(j.gopath)
+func (b *Job) clean() (err error) {
+	b.sh.Call("echo", []string{"cleaning..."})
+	err = os.RemoveAll(b.gopath)
 	return
 }
 
 // init + build + pkg + clean
-func (j *Job) Auto() (err error) {
+func (j *Job) Auto() (addr string, err error) {
 	if err = j.init(); err != nil {
 		return
 	}
@@ -143,12 +143,13 @@ func (j *Job) Auto() (err error) {
 		}
 		j.wbc.CloseWriters()
 	}()
+	// build xc
 	file, err := j.build("linux", "amd64")
 	if err != nil {
 		return
 	}
-	fmt.Println(file)
-	if err = j.pkg(); err != nil {
+	addr, err = j.pkg([]string{file})
+	if err != nil {
 		return
 	}
 
@@ -160,5 +161,5 @@ func (j *Job) Auto() (err error) {
 	if err != nil {
 		return
 	}
-	return j.pkg()
+	return
 }
