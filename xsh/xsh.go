@@ -89,6 +89,6 @@ func (s *Session) invokeExec(cmd string, args []string, cwd Dir) error {
 	c.Env = envs
 	c.Dir = string(cwd)
 	c.Stdout = s.Stdout
-	c.Stderr = s.Stdout
+	c.Stderr = s.Stderr
 	return c.Run()
 }

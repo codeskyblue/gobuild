@@ -32,26 +32,31 @@ type Job struct {
 	wbc     *utils.WriteBroadcaster
 	cmd     *exec.Cmd
 	sh      *xsh.Session
-	gopath  string
-	project string
-	srcDir  string
+	project string //
 	ref     string
+	gopath  string // init
+	srcDir  string // init
+	sha     string // get
 	sync.Mutex
 }
 
 func NewJob(project, ref string, wbc *utils.WriteBroadcaster) *Job {
-	env := map[string]string{
-		"PATH":    "/bin:/usr/bin:/usr/local/bin",
-		"PROJECT": project,
-	}
 	b := &Job{
 		wbc:     wbc,
 		sh:      xsh.NewSession(),
 		project: project,
 		ref:     ref,
 	}
-	b.sh.Stdout = wbc
-	b.sh.Stderr = wbc
+	//fmt.Println(reflect.TypeOf(wbc), wbc)
+	if wbc != nil {
+		b.sh.Stdout = wbc
+		b.sh.Stderr = wbc
+		//b.wbc = wbc
+	}
+	env := map[string]string{
+		"PATH":    "/bin:/usr/bin:/usr/local/bin",
+		"PROJECT": project,
+	}
 	b.sh.Env = env
 	return b
 }
@@ -94,6 +99,12 @@ func (b *Job) get() (err error) {
 	if err != nil {
 		return
 	}
+	r, err := xsh.Capture("git", []string{"rev-parse", "HEAD"}, xsh.Dir(b.srcDir))
+	if err != nil {
+		return
+	}
+	b.sha = r.Trim()
+	//log.Println("cur sha = ", b.sha)
 	return
 }
 
@@ -130,11 +141,15 @@ func (b *Job) clean() (err error) {
 
 // init + build + pkg + clean
 func (j *Job) Auto() (addr string, err error) {
-	defer j.wbc.CloseWriters()
+	defer func() {
+		if j.wbc != nil {
+			j.wbc.CloseWriters()
+		}
+	}()
 	if err = j.init(); err != nil {
 		return
 	}
-	// defer should start when GOPATH success created
+	// defer clean should start when GOPATH success created
 	defer func() {
 		er := j.clean()
 		if er != nil {

@@ -24,6 +24,17 @@ func InitRouter() {
 	m.Get("/", func(r render.Render) {
 		r.HTML(200, "index", nil)
 	})
+	m.Get("/gh/:account/:proj/:ref/:goos/:goarch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
+		project := "github.com/" + p["account"] + "/" + p["proj"]
+		ref := p["ref"]
+		job := NewJob(project, ref, nil)
+		addr, err := job.Auto()
+		if err != nil {
+			lg.Error(err)
+			http.NotFound(w, r)
+		}
+		http.Redirect(w, r, addr, http.StatusTemporaryRedirect)
+	})
 	m.Get("/github.com/:account/:proj/:ref/:goos/:goarch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
 		var err error
 		var id = uuid.New()
