@@ -1,9 +1,9 @@
 package models
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
+	"time"
 
 	"github.com/astaxie/beego/utils"
 	"github.com/lunny/xorm"
@@ -17,23 +17,112 @@ var (
 	lg     = klog.DevLog
 )
 
-type Project struct {
-	Name      string //`xorm:"unique(p)"`
-	Uuid      string //`xorm:"unique(p)"`
-	Ref       string
-	Mtime     string
-	Address   string
-	ViewCount int
-
-	Project string `xorm:"pk"`
-	Sha     string
+func init() {
+	var err error
+	x, err = xorm.NewEngine("sqlite3", dbName)
+	if err != nil {
+		lg.Fatal(err)
+	}
+	// create tables
+	if err = x.Sync(new(Project), new(File)); err != nil {
+		lg.Fatal(err)
+	}
 }
 
+type Project struct {
+	Id        int64  `xorm:"pk autoincr"`
+	Name      string `xorm:"unique(nr)"`
+	Sha       string `xorm:"unique(nr)"`
+	Ref       string
+	Time      time.Time `xorm:"created"`
+	ViewCount int
+}
+
+type File struct {
+	Id        int64 `xorm:"pk autoincr"`
+	ProjId    int64
+	Tag       string
+	Addr      string
+	Log       string    `xorm:"text"`
+	Time      time.Time `xorm:"created"`
+	ViewCount int
+	Version   int `xorm:"version"`
+}
+
+func SearchProject(name, sha string) (p *Project, err error) {
+	p = new(Project)
+	p.Name = name
+	p.Sha = sha
+	ok, err := x.Get(p)
+	if err != nil {
+		return
+	}
+	if !ok {
+		err = fmt.Errorf("project:%s not found", name)
+		return
+	}
+	return
+}
+
+func AddProject(name, ref, sha string) (id int64, err error) {
+	p := &Project{
+		Name: name,
+		Ref:  ref,
+		Sha:  sha,
+	}
+	affec, err := x.InsertOne(p)
+	if err != nil {
+		return
+	}
+	if affec != 1 {
+		err = fmt.Errorf("insert record(%s,%s,%s) failed", name, ref, sha)
+		return
+	}
+	sp, err := SearchProject(name, sha)
+	if err != nil {
+		return
+	}
+	return sp.Id, nil
+}
+
+func SearchFile(projId int64, tag string) (f *File, err error) {
+	f = new(File)
+	f.ProjId = projId
+	f.Tag = tag
+	ok, err := x.Get(f)
+	if err != nil {
+		return
+	}
+	if !ok {
+		err = fmt.Errorf("not found: (%d, %s)", projId, tag)
+	}
+	return
+}
+
+func AddFile(projId int64, tag, addr, log string) (err error) {
+	f := File{
+		ProjId: projId,
+		Tag:    tag,
+		Addr:   addr,
+		Log:    log,
+	}
+	affec, err := x.InsertOne(f)
+	if err != nil {
+		return
+	}
+	if affec != 1 {
+		err = fmt.Errorf("AddFile(%d, %s) failed", projId, tag)
+		return
+	}
+	return
+}
+
+/*
 func SyncProject(l *Project) error {
 	if l == nil {
 		return errors.New("sync nil")
 	}
-	affec, err := x.Where("project=?", l.Project).Update(l)
+	affec, err := x.Where("project=?", l.Name).Update(l)
 	if err != nil {
 		return err
 	}
@@ -56,14 +145,4 @@ func GetSha(project string) (sha string, err error) {
 	}
 	return l.Sha, nil
 }
-
-func init() {
-	var err error
-	x, err = xorm.NewEngine("sqlite3", dbName)
-	if err != nil {
-		lg.Fatal(err)
-	}
-	if err = x.Sync(new(Project)); err != nil {
-		lg.Fatal(err)
-	}
-}
+*/

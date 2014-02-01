@@ -14,7 +14,6 @@ import (
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
-	"github.com/shxsun/gobuild/models"
 )
 
 func InitRouter() {
@@ -133,47 +132,51 @@ func InitRouter() {
 		lg.Debug("end rebuild")
 	})
 
-	// for autobuild script upload result
-	m.Post("/api/update", func(req *http.Request) (int, string) {
-		// for secure reason, only accept 127.0.0.1 address
-		lg.Warnf("Unexpected request: %s", req.RemoteAddr)
-		if !strings.HasPrefix(req.RemoteAddr, "127.0.0.1:") {
+	/*
+		// for autobuild script upload result
+		m.Post("/api/update", func(req *http.Request) (int, string) {
+			// for secure reason, only accept 127.0.0.1 address
 			lg.Warnf("Unexpected request: %s", req.RemoteAddr)
-			return 200, ""
-		}
-		project, sha := req.FormValue("p"), req.FormValue("sha")
-		lg.Debug(project, sha)
+			if !strings.HasPrefix(req.RemoteAddr, "127.0.0.1:") {
+				lg.Warnf("Unexpected request: %s", req.RemoteAddr)
+				return 200, ""
+			}
+			project, sha := req.FormValue("p"), req.FormValue("sha")
+			lg.Debug(project, sha)
 
-		record := new(models.Project)
-		record.Name = project
-		record.Project = project // FIXME: delete it
-		record.Sha = sha
-		err := models.SyncProject(record)
-		if err != nil {
-			lg.Error(err)
-			return 500, err.Error()
-		}
-		return 200, "OK"
-	})
+			record := new(models.Project)
+			record.Name = project
+			record.Project = project // FIXME: delete it
+			record.Sha = sha
+			err := models.SyncProject(record)
+			if err != nil {
+				lg.Error(err)
+				return 500, err.Error()
+			}
+			return 200, "OK"
+		})
+	*/
 
-	m.Get("/dl", func(req *http.Request, r render.Render) (code int, body string) {
-		os, arch := req.FormValue("os"), req.FormValue("arch") //"windows", "amd64"
-		project := req.FormValue("p")                          //"github.com/shxsun/fswatch"
-		filename := filepath.Base(project)
-		if os == "windows" {
-			filename += ".exe"
-		}
+	/*
+		m.Get("/dl", func(req *http.Request, r render.Render) (code int, body string) {
+			os, arch := req.FormValue("os"), req.FormValue("arch") //"windows", "amd64"
+			project := req.FormValue("p")                          //"github.com/shxsun/fswatch"
+			filename := filepath.Base(project)
+			if os == "windows" {
+				filename += ".exe"
+			}
 
-		// sha should get from db
-		//sha := "d1077e2e106489b81c6a404e6951f1fca8967172"
-		sha, err := models.GetSha(project)
-		if err != nil {
-			return 500, err.Error()
-		}
-		// path like: cdn://project/sha/os_arch/filename
-		r.Redirect(opts.CDN+"/"+filepath.Join(project, sha, os+"_"+arch, filename), 302)
-		return
-	})
+			// sha should get from db
+			//sha := "d1077e2e106489b81c6a404e6951f1fca8967172"
+			sha, err := models.GetSha(project)
+			if err != nil {
+				return 500, err.Error()
+			}
+			// path like: cdn://project/sha/os_arch/filename
+			r.Redirect(opts.CDN+"/"+filepath.Join(project, sha, os+"_"+arch, filename), 302)
+			return
+		})
+	*/
 
 	m.Get("/dlscript/**", func(params martini.Params) (s string, err error) {
 		project := params["_1"]

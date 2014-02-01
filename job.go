@@ -175,7 +175,7 @@ func (j *Job) Auto() (addr string, err error) {
 	p := new(models.Project)
 	p.Name = j.project
 	p.Ref = "master" // TODO
-	err = models.SyncProject(p)
+	//err = models.SyncProject(p)
 	if err != nil {
 		return
 	}
