@@ -1,0 +1,20 @@
+---
+development:
+    hostname: localhost
+    listen: 0.0.0.0:3000 
+    driver: sqlite3
+    data_source: ./sqlite.db
+    goroot: /Users/skyblue/go
+    # qiniu
+    access_key: xxxx
+    secret_key: xxxx
+
+production:
+    hostname: gobuild.io
+    listen: 0.0.0.0:3000
+    driver: sqlite3
+    data_source: ./sqlite.db
+    goroot: /usr/local/go 
+    # qiniu
+    access_key: xxxx
+    secret_key: xxxx
