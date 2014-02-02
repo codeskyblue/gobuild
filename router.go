@@ -23,7 +23,7 @@ func InitRouter() {
 	m.Get("/", func(r render.Render) {
 		r.HTML(200, "index", nil)
 	})
-	m.Get("/gh/:account/:proj/:ref/:goos/:goarch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
+	m.Get("/gh/:account/:proj/:ref/:os/:arch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
 		project := "github.com/" + p["account"] + "/" + p["proj"]
 		ref := p["ref"]
 		os, arch := p["os"], p["arch"]
