@@ -49,7 +49,7 @@ func NewProject(addr, name string) *Project {
 
 		// start compiling job
 		go func() {
-			_, err := NewJob(addr, "-", wc).Auto()
+			_, err := NewJob(addr, "-", "linux", "amd64", wc).Auto()
 			if err != nil {
 				lg.Error(err)
 			}

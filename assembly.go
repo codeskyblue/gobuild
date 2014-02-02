@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"code.google.com/p/go-uuid/uuid"
 
 	"github.com/Unknwon/cae/zip"
 	"launchpad.net/goyaml"
@@ -86,7 +87,9 @@ func pkgZip(root string, files []string) (addr string, err error) {
 		lg.Error(err)
 		return
 	}
-	return uploadFile(tmpFile.Name())
+	return UploadFile(tmpFile.Name(), uuid.New()+"/"+filepath.Base(root)+".zip")
+	//return uploadFile(
+	//return uploadFile(tmpFile.Name())
 }
 
 // package according .gobuild, return a download url

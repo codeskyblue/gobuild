@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"sync"
 
 	beeutils "github.com/astaxie/beego/utils"
 	"github.com/shxsun/gobuild/models"
@@ -34,18 +33,25 @@ type Job struct {
 	sh      *xsh.Session
 	project string //
 	ref     string
-	gopath  string // init
-	srcDir  string // init
-	sha     string // get
-	sync.Mutex
+	os      string
+	arch    string
+
+	gopath string // init
+	srcDir string // init
+	sha    string // get
+
+	pid int64 // db
+	//sync.Mutex
 }
 
-func NewJob(project, ref string, wbc *utils.WriteBroadcaster) *Job {
+func NewJob(project, ref string, os, arch string, wbc *utils.WriteBroadcaster) *Job {
 	b := &Job{
 		wbc:     wbc,
 		sh:      xsh.NewSession(),
 		project: project,
 		ref:     ref,
+		os:      os,
+		arch:    arch,
 	}
 	//fmt.Println(reflect.TypeOf(wbc), wbc)
 	if wbc != nil {
@@ -95,7 +101,7 @@ func (b *Job) get() (err error) {
 	if b.ref == "-" {
 		b.ref = "master"
 	}
-	err = b.sh.Call("git", []string{"checkout", b.ref})
+	err = b.sh.Call("git", []string{"checkout", "-q", b.ref})
 	if err != nil {
 		return
 	}
@@ -161,8 +167,29 @@ func (j *Job) Auto() (addr string, err error) {
 	if err != nil {
 		return
 	}
+	// search db for history data
+	p, err := models.SearchProject(j.project, j.sha)
+	if err != nil {
+		pid, er := models.AddProject(j.project, j.ref, j.sha)
+		if er != nil {
+			err = er
+			return
+		}
+		j.pid = pid // project id
+	} else {
+		j.pid = p.Id
+	}
+
+	// search build history file
+	tag := j.os + "-" + j.arch
+	f, err := models.SearchFile(j.pid, tag)
+	if err == nil {
+		addr = f.Addr
+		return
+	}
 	// build xc
-	file, err := j.build("linux", "amd64")
+	j.sh.Call("echo", "building")
+	file, err := j.build(j.os, j.arch)
 	if err != nil {
 		return
 	}
@@ -170,14 +197,6 @@ func (j *Job) Auto() (addr string, err error) {
 	if err != nil {
 		return
 	}
-
-	// save to db
-	p := new(models.Project)
-	p.Name = j.project
-	p.Ref = "master" // TODO
-	//err = models.SyncProject(p)
-	if err != nil {
-		return
-	}
+	err = models.AddFile(j.pid, tag, addr, "output-")
 	return
 }

@@ -26,7 +26,8 @@ func InitRouter() {
 	m.Get("/gh/:account/:proj/:ref/:goos/:goarch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
 		project := "github.com/" + p["account"] + "/" + p["proj"]
 		ref := p["ref"]
-		job := NewJob(project, ref, nil)
+		os, arch := p["os"], p["arch"]
+		job := NewJob(project, ref, os, arch, nil)
 		addr, err := job.Auto()
 		if err != nil {
 			lg.Error(err)
