@@ -13,8 +13,6 @@ There are a lot of golang open souce project, but few website offers golang bina
 
 ### For developers
 #### Prepare dependencies
-* [gox](https://github.com/mitchellh/gox) 
-
 	go get github.com/mitchellh/gox
 	
 	# build toolchain
