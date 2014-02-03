@@ -1,4 +1,4 @@
-# gobuild
+## gobuild
 [![Build Status](https://drone.io/github.com/shxsun/gobuild/status.png)](https://drone.io/github.com/shxsun/gobuild/latest)
 [![Total views](https://sourcegraph.com/api/repos/github.com/shxsun/gobuild/counters/views.png)](https://sourcegraph.com/github.com/shxsun/gobuild)
 
@@ -8,11 +8,11 @@ Go build + pacakge + distributions
 
 There are a lot of golang open souce project, but few website offers golang binary download. So I created one.
 
-## How to use
+### How to use
 	wget gobuild.io/github.com/shxsun/fswatch/v1.0/linux/amd64 -O fswatch.zip
 
-## For developers
-### Prepare dependencies
+### For developers
+#### Prepare dependencies
 * [gox](https://github.com/mitchellh/gox) 
 
 	go get github.com/mitchellh/gox
@@ -20,25 +20,25 @@ There are a lot of golang open souce project, but few website offers golang bina
 	# build toolchain
 	gox -build-toolchain
 
-### setup
+#### setup
 	go get github.com/shxsun/gobuild
 	
 	# update config.yaml
 	go build && ./gobuild
 	
 
-## related package
+### related package
 * <https://github.com/codegangsta/martini>
 * [gox](https://github.com/mitchellh/gox) 
 * ...
 
-## Q/A(knownen issues)
-- not support os/user
+### Q/A(knownen issues)
+##### not support os/user
 
 	golang's cross compile not support CGO, but package os/user use CGO.
 	sulutions: use environment variables to get use-name <http://stackoverflow.com/questions/7922270/obtain-users-home-directory>
 
-## Contributers
+### Contributers
 * [skyblue](https://github.com/shxsun)
 * [Codefor](https://github.com/Codefor)
 * ...
