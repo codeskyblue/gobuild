@@ -6,10 +6,11 @@ Online website: <http://gobuild.io>
 
 Go build + pacakge + distributions
 
-There are a lot of golang open souce project, but few website offers golang binary download. So I created one.
+There are a lot of golang open souce project, sometime we want to share code, sometimes we want to share binary file to friends.
+But few website offers golang binary shares. So I created one.
 
 ### How to use
-	wget gobuild.io/github.com/shxsun/fswatch/v1.0/linux/amd64 -O fswatch.zip
+	-still developing wget gobuild.io/github.com/shxsun/fswatch/v1.0/linux/amd64 -O fswatch.zip-
 
 ### For developers
 #### Prepare dependencies
@@ -27,6 +28,7 @@ There are a lot of golang open souce project, but few website offers golang bina
 
 ### related package
 * <https://github.com/codegangsta/martini>
+* <https://github.com/codegangsta/inject>
 * [gox](https://github.com/mitchellh/gox) 
 * ...
 
