@@ -1,8 +1,0 @@
----
-filesets:
-    includes:
-        - static
-        - README.*
-        - LICENSE
-    excludes:
-        - .svn
