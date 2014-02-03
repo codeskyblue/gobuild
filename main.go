@@ -2,17 +2,19 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
+	"launchpad.net/goyaml"
 
 	"code.google.com/p/go.net/websocket"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
-	"github.com/jessevdk/go-flags"
+	"github.com/qiniu/api/conf"
 	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/klog"
 )
@@ -20,8 +22,7 @@ import (
 var (
 	mu         = &sync.Mutex{}
 	broadcasts = make(map[string]*utils.WriteBroadcaster)
-	//joblist    = make(map[string]*Job)
-	totalUser = 0
+	totalUser  = 0
 
 	lg = klog.DevLog
 
@@ -114,6 +115,7 @@ func WsBuildServer(ws *websocket.Conn) {
 	}
 }
 
+/*
 var (
 	opts struct {
 		ConfigFile string `short:"f" long:"file" description:"configuration file" default:"app.ini"`
@@ -130,7 +132,22 @@ var (
 
 	listenAddr = ""
 )
+*/
 
+type Configuration struct {
+	Hostname   string `yaml:"hostname"`
+	ListenAddr string `yaml:"listen"`
+	GOROOT     string `yaml:"goroot"`
+	AccessKey  string `yaml:"access_key"`
+	SecretKey  string `yaml:"secret_key"`
+}
+
+type config struct {
+	Development Configuration `yaml:"development"`
+	Production  Configuration `yaml:"production"`
+}
+
+/*
 func parseConfig() (err error) {
 	parser := flags.NewParser(&opts, flags.Default)
 	args, err = flags.Parse(&opts)
@@ -159,10 +176,39 @@ func parseConfig() (err error) {
 	listenAddr = opts.Server[sepIndex:]
 	return err
 }
+*/
 
-var m = martini.Classic()
+var (
+	m           = martini.Classic()
+	environment = flag.String("e", "development", "select environment <development|production>")
+	opts        *Configuration
+)
 
 func init() {
+	cfg := new(config)
+	in, err := ioutil.ReadFile("config.yaml")
+	if err != nil {
+		lg.Fatal(err)
+	}
+	err = goyaml.Unmarshal(in, cfg)
+	if err != nil {
+		lg.Fatal(err)
+	}
+
+	flag.Parse()
+
+	if *environment == "development" {
+		opts = &cfg.Development
+	} else {
+		opts = &cfg.Production
+	}
+
+	fmt.Println("== environment:", *environment, "==")
+	utils.Dump(opts)
+
+	conf.ACCESS_KEY = opts.AccessKey
+	conf.SECRET_KEY = opts.SecretKey
+
 	// render html templates from templates directory
 	m.Use(render.Renderer(render.Options{
 		Layout: "layout",
@@ -172,16 +218,12 @@ func init() {
 
 func main() {
 	var err error
-	if err = parseConfig(); err != nil {
-		return
-	}
-	utils.Dump(opts)
 	lg.Info("gobuild service stated ...")
 
 	http.Handle("/", m)
 	http.Handle("/websocket", websocket.Handler(WsBuildServer))
 
-	if err = http.ListenAndServe(listenAddr, nil); err != nil {
+	if err = http.ListenAndServe(opts.ListenAddr, nil); err != nil {
 		lg.Fatal(err)
 	}
 }

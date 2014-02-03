@@ -3,14 +3,25 @@ package main
 import (
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
-	"code.google.com/p/go-uuid/uuid"
 
+	"code.google.com/p/go-uuid/uuid"
 	"github.com/Unknwon/cae/zip"
 	"launchpad.net/goyaml"
 )
+
+// package according .gobuild, return a download url
+// format: <tgz|zip>
+var defaultRc = `---
+filesets:
+    includes:
+        - static
+        - README.*
+        - LICENSE
+    excludes:
+        - .svn
+`
 
 type FileSet struct {
 	Includes []string `yaml:"includes"`
@@ -19,22 +30,6 @@ type FileSet struct {
 
 type Assembly struct {
 	FileSet `yaml:"filesets"`
-}
-
-// upload a file and return a address
-// FIXME: need to support qiniu
-func uploadFile(file string) (addr string, err error) {
-	f, err := ioutil.TempFile("files", "upload-")
-	if err != nil {
-		return
-	}
-	err = f.Close()
-	if err != nil {
-		return
-	}
-	exec.Command("cp", "-f", file, f.Name()).Run()
-	addr = "http://" + filepath.Join(opts.Hostname, f.Name())
-	return
 }
 
 // basic regrex match
@@ -46,7 +41,7 @@ func match(bre string, str string) bool {
 }
 
 func pkgZip(root string, files []string) (addr string, err error) {
-	tmpFile, err := ioutil.TempFile("files", "upload-")
+	tmpFile, err := ioutil.TempFile("tmp", "upload-")
 	if err != nil {
 		return
 	}
@@ -87,22 +82,14 @@ func pkgZip(root string, files []string) (addr string, err error) {
 		lg.Error(err)
 		return
 	}
-	return UploadFile(tmpFile.Name(), uuid.New()+"/"+filepath.Base(root)+".zip")
-	//return uploadFile(
-	//return uploadFile(tmpFile.Name())
-}
 
-// package according .gobuild, return a download url
-// format: <tgz|zip>
-var defaultRc = `---
-filesets:
-    includes:
-        - static
-        - README.*
-        - LICENCE
-    excludes:
-        - .svn
-`
+	// upload
+	if *environment == "development" {
+		return uploadFile(tmpFile.Name())
+	} else {
+		return UploadFile(tmpFile.Name(), uuid.New()+"/"+filepath.Base(root)+".zip")
+	}
+}
 
 func Package(bins []string, rcfile string) (addr string, err error) {
 	lg.Debug(bins)

@@ -3,6 +3,6 @@ filesets:
     includes:
         - static
         - README.*
-        - LICENCE
+        - LICENSE
     excludes:
         - .svn

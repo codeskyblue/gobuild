@@ -27,9 +27,10 @@ But few website offers golang binary shares. So I created one.
 	
 
 ### related package
-* <https://github.com/codegangsta/martini>
-* <https://github.com/codegangsta/inject>
-* [gox](https://github.com/mitchellh/gox) 
+* web framework: <https://github.com/codegangsta/martini>
+* xsh use: <https://github.com/codegangsta/inject>
+* zip archive support: <https://github.com/Unknwon/cae>
+* golang cross compile <https://github.com/mitchellh/gox>
 * ...
 
 ### Q/A(knownen issues)

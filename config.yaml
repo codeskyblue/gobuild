@@ -5,9 +5,6 @@ development:
     driver: sqlite3
     data_source: ./sqlite.db
     goroot: /Users/skyblue/go
-    # qiniu
-    access_key: xxxx
-    secret_key: xxxx
 
 production:
     hostname: gobuild.io
@@ -16,5 +13,5 @@ production:
     data_source: ./sqlite.db
     goroot: /usr/local/go 
     # qiniu
-    access_key: xxxx
+    access_key: BgESh3GconLxVmqlkM19U3ANknrCsTWwIx67S3fo
     secret_key: xxxx
