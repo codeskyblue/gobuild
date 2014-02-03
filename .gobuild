@@ -1,12 +1,12 @@
 ---
 filesets:
     includes:
-		- public
-		- templates
-		- bin
-		- config.yaml
+        - public
+        - templates
+        - bin
+        - config.yaml
         - README.md
         - LICENSE
-		- CHANGELOG
+        - CHANGELOG
     excludes:
         - .svn
