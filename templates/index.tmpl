@@ -2,16 +2,24 @@
 	<div class="col-md-12 column">
 		<form id="form" role="form" method="get" action="#">
 			<div class="form-group">
-				<label for="name">gits project address</label>
+				<label for="name">git project address</label>
 				<input type="text" class="form-control col-md-8" id="address" placeholder="github.com/user/project" required autofocus/>
 			</div>
-			<button type="submit" class="btn btn-default">在线编译</button>
+			<button type="submit" class="btn btn-default">goto download page</button>
 		</form>
 	</div>
 </div>
 <hr/>
 <div class="row clearfix">
 	<div class="col-md-12 column">
+		<p>
+			Sample Usage:
+			<div class=code>
+			wget {{.Hostname}}/github.com/gpmgo/gopm/master/linux/amd64 -O gopm.zip
+			</div>
+		</p>
+		<p> This website is still in progress, there must have a lot to learn and grow. If you feel something can be better, please tell us through <a href="https://github.com/shxsun/gobuild/issues">github issues</a>. We will try our best to make it better.
+		</p>
 		<p>
 		该项目还处于起步的阶段，肯定还有许多需要完善的。如果你感觉哪里需要改进的地方，直接<a href="https://github.com/shxsun/gobuild/issues">提交个issue</a>就可以啦。
 		<br/>
@@ -21,21 +29,14 @@
 </div>
 <div class="row clearfix">
 	<div class="col-md-12 column">
-		<h2>案例</h2>
+		<h2>Cases</h2>
 		<ul>
-			<li><a href="./build/github.com/beego/bee">在线编译 github.com/beego/bee</a></li>
-			<li><a href="./build/github.com/gpmgo/gopm">在线编译 github.com/gpmgo/gopm</a></li>
-			<li><a href="./build/github.com/laher/goxc">在线编译 github.com/laher/goxc</a></li>
-			<li><a href="./build/github.com/parkghost/gohttpbench">在线编译 github.com/parkghost/gohttpbench</a></li>
+			<li><a href="./download/github.com/beego/bee">github.com/beego/bee</a></li>
+			<li><a href="./download/github.com/gpmgo/gopm">github.com/gpmgo/gopm</a></li>
+			<li><a href="./download/github.com/laher/goxc">github.com/laher/goxc</a></li>
+			<li><a href="./download/github.com/parkghost/gohttpbench">github.com/parkghost/gohttpbench</a></li>
 			<li>...</li>
 		</ul>
-	</div>
-</div>
-<div class="row clearfix">
-	<div class="col-md-12 column">
-		<div class="text-right">
-			<small>author: <em>skyblue</em>、<em>Codefor</em></small>
-		</div>
 	</div>
 </div>
 <script src="./home.js"></script>

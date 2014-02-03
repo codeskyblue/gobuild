@@ -25,22 +25,32 @@
 			<div class="form-group">
 				<label class="col-md-2">版本</label>
 				<div class="col-md-10">
-					<label><input type="radio" name="version" value="latest" checked /> latest</label>
+					<label><input type="radio" name="version" value="master" checked /> master</label>
 				</div>
 			</div>
-			<button type="submit" class="btn btn-default">download</button>
 		</form>
 	</div>
 
 	<hr/>
 	<p>
-		<h4> 使用wget,指定os和arch下载</h4>
-		wget "http://{{.Server}}/dl?p={{.Project}}&os=windows&arch=amd64"
+		<input type="input" id="wgetaddr" class="col-md-12" onclick="this.select()" value="wget http://{{.Hostname}}/{{.Project}}/master/windows/amd64 -O output.zip" />
 	</p>
 
+	<!--
 	<h4>使用脚本下载</h4>
 	<code>
 		curl -s http://{{.Server}}/dlscript/{{.Project}} | bash
 	</code>
+	-->
+	<script>
+	$(function(){
+		$wget = $("#wgetaddr");
+		$("form").change(function(){
+			os = $(":input[name=os]:checked").val();
+			arch = $(":input[name=arch]:checked").val();
+			$wget.val("wget http://{{.Hostname}}/{{.Project}}/master/"+os+"/"+arch + " -O output.zip");
+		});
+	});
+	</script>
 </div>
 

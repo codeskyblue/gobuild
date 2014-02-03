@@ -41,7 +41,7 @@ func match(bre string, str string) bool {
 }
 
 func pkgZip(root string, files []string) (addr string, err error) {
-	tmpFile, err := ioutil.TempFile("tmp", "upload-")
+	tmpFile, err := ioutil.TempFile("tmp", "tmp-")
 	if err != nil {
 		return
 	}
@@ -85,7 +85,7 @@ func pkgZip(root string, files []string) (addr string, err error) {
 
 	// upload
 	if *environment == "development" {
-		return uploadFile(tmpFile.Name())
+		return UploadLocal(tmpFile.Name())
 	} else {
 		return UploadFile(tmpFile.Name(), uuid.New()+"/"+filepath.Base(root)+".zip")
 	}

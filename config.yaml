@@ -1,6 +1,6 @@
 ---
 development:
-    hostname: localhost
+    hostname: localhost:3000
     listen: 0.0.0.0:3000 
     driver: sqlite3
     data_source: ./sqlite.db

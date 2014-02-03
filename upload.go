@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -19,14 +20,16 @@ func UploadFile(localFile string, destName string) (addr string, err error) {
 	var ret io.PutRet
 	var extra = new(io.PutExtra)
 	err = io.PutFile(nil, &ret, uptoken, destName, localFile, extra)
+	if err != nil {
+		return
+	}
+	defer os.Remove(localFile)
 	addr = "http://" + SCOPE + ".qiniudn.com/" + destName
 	return
 }
 
-// upload a file and return a address
-// FIXME: need to support qiniu
-func uploadFile(file string) (addr string, err error) {
-	f, err := ioutil.TempFile("files", "upload-")
+func UploadLocal(file string) (addr string, err error) {
+	f, err := ioutil.TempFile("files/", "upload-")
 	if err != nil {
 		return
 	}
