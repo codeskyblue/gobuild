@@ -23,7 +23,7 @@ func InitRouter() {
 		addr, err := job.Auto()
 		if err != nil {
 			lg.Error(err)
-			http.NotFound(w, r)
+			http.Error(w, "project build error: "+err.Error(), 500)
 		}
 		http.Redirect(w, r, addr, http.StatusTemporaryRedirect)
 	})

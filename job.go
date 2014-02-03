@@ -62,6 +62,7 @@ func NewJob(project, ref string, os, arch string, wbc *utils.WriteBroadcaster) *
 	env := map[string]string{
 		"PATH":    "/bin:/usr/bin:/usr/local/bin",
 		"PROJECT": project,
+		"GOROOT":  opts.GOROOT,
 	}
 	b.sh.Env = env
 	return b
