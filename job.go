@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -85,10 +84,13 @@ func (b *Job) init() (err error) {
 
 // download src
 func (b *Job) get() (err error) {
-	b.sh.Call("echo", []string{"downloading src"})
-	err = b.sh.Call("go", []string{"get", "-v", "-d", b.project})
-	if err != nil {
-		return
+	exists := beeutils.FileExists(b.srcDir)
+	if !exists {
+		b.sh.Call("echo", []string{"downloading src"})
+		err = b.sh.Call("go", []string{"get", "-v", "-d", b.project})
+		if err != nil {
+			return
+		}
 	}
 	err = b.sh.Call("echo", []string{"fetch", b.ref}, xsh.Dir(b.srcDir))
 	if err != nil {
@@ -149,7 +151,6 @@ func (b *Job) clean() (err error) {
 func (j *Job) Auto() (addr string, err error) {
 	lock := utils.NewNameLock(j.project)
 	lock.Lock()
-	log.Println("good", j.project)
 	defer func() {
 		lock.Unlock()
 		if j.wbc != nil {
