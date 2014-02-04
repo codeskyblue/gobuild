@@ -6,28 +6,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 
 	beeutils "github.com/astaxie/beego/utils"
 	"github.com/shxsun/gobuild/models"
 	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/gobuild/xsh"
 )
-
-/*
-var GOPATH, GOBIN string
-
-func init() {
-	var err error
-	GOPATH, err = filepath.Abs("project")
-	if err != nil {
-		lg.Fatal(err)
-	}
-	GOBIN, err = filepath.Abs("files")
-	if err != nil {
-		lg.Fatal(err)
-	}
-}
-*/
 
 type Job struct {
 	wbc     *utils.WriteBroadcaster
@@ -64,6 +49,11 @@ func NewJob(project, ref string, os, arch string, wbc *utils.WriteBroadcaster) *
 		"PROJECT": project,
 		"GOROOT":  opts.GOROOT,
 	}
+	// enable cgo on current machine
+	if os == runtime.GOOS && arch == runtime.GOARCH {
+		env["CGO_ENABLED"] = "1"
+	}
+
 	b.sh.Env = env
 	return b
 }
