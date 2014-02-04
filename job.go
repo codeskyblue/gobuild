@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -13,6 +14,7 @@ import (
 	"github.com/shxsun/gobuild/xsh"
 )
 
+/*
 var GOPATH, GOBIN string
 
 func init() {
@@ -26,6 +28,7 @@ func init() {
 		lg.Fatal(err)
 	}
 }
+*/
 
 type Job struct {
 	wbc     *utils.WriteBroadcaster
@@ -37,11 +40,11 @@ type Job struct {
 	arch    string
 
 	gopath string // init
+	gobin  string // init
 	srcDir string // init
 	sha    string // get
 
 	pid int64 // db
-	//sync.Mutex
 }
 
 func NewJob(project, ref string, os, arch string, wbc *utils.WriteBroadcaster) *Job {
@@ -53,11 +56,9 @@ func NewJob(project, ref string, os, arch string, wbc *utils.WriteBroadcaster) *
 		os:      os,
 		arch:    arch,
 	}
-	//fmt.Println(reflect.TypeOf(wbc), wbc)
 	if wbc != nil {
 		b.sh.Stdout = wbc
 		b.sh.Stderr = wbc
-		//b.wbc = wbc
 	}
 	env := map[string]string{
 		"PATH":    "/bin:/usr/bin:/usr/local/bin",
@@ -70,15 +71,14 @@ func NewJob(project, ref string, os, arch string, wbc *utils.WriteBroadcaster) *
 
 // prepare environ
 func (b *Job) init() (err error) {
-	gopath, err := ioutil.TempDir("tmp", "gopath-")
+	gobin, err := ioutil.TempDir("tmp", "gobin-")
 	if err != nil {
 		return
 	}
-	b.gopath, err = filepath.Abs(gopath)
-	if err != nil {
-		return
-	}
+	b.gobin, _ = filepath.Abs(gobin)
+	b.gopath, _ = filepath.Abs("gopath")
 	b.sh.Env["GOPATH"] = b.gopath
+	b.sh.Env["GOBIN"] = b.gobin
 	b.srcDir = filepath.Join(b.gopath, "src", b.project)
 	return
 }
@@ -111,7 +111,6 @@ func (b *Job) get() (err error) {
 		return
 	}
 	b.sha = r.Trim()
-	//log.Println("cur sha = ", b.sha)
 	return
 }
 
@@ -121,7 +120,7 @@ func (j *Job) build(os, arch string) (file string, err error) {
 	j.sh.Env["GOOS"] = os
 	j.sh.Env["GOARCH"] = arch
 
-	err = j.sh.Call("go", []string{"get", "-v", "."})
+	err = j.sh.Call("go", []string{"get", "-u", "-v", "."})
 	if err != nil {
 		return
 	}
@@ -130,8 +129,8 @@ func (j *Job) build(os, arch string) (file string, err error) {
 	if os == "windows" {
 		target += ".exe"
 	}
-	gobin := filepath.Join(j.gopath, "bin")
-	return beeutils.SearchFile(target, gobin, filepath.Join(gobin, os+"_"+arch))
+	//gobin := filepath.Join(j.gopath, "bin")
+	return beeutils.SearchFile(target, j.gobin, filepath.Join(j.gobin, os+"_"+arch))
 }
 
 // achieve and upload
@@ -142,13 +141,17 @@ func (b *Job) pkg(bins []string) (addr string, err error) {
 // remove tmp file
 func (b *Job) clean() (err error) {
 	b.sh.Call("echo", []string{"cleaning..."})
-	err = os.RemoveAll(b.gopath)
+	err = os.RemoveAll(b.gobin)
 	return
 }
 
 // init + build + pkg + clean
 func (j *Job) Auto() (addr string, err error) {
+	lock := utils.NewNameLock(j.project)
+	lock.Lock()
+	log.Println("good", j.project)
 	defer func() {
+		lock.Unlock()
 		if j.wbc != nil {
 			j.wbc.CloseWriters()
 		}
