@@ -1,6 +1,6 @@
 ## [gobuild.io](http://gobuild.io)
 [![Build Status](https://drone.io/github.com/shxsun/gobuild/status.png)](https://drone.io/github.com/shxsun/gobuild/latest)
-[![Total views](https://sourcegraph.com/api/repos/github.com/shxsun/gobuild/counters/views.png)](https://sourcegraph.com/github.com/shxsun/gobuild)
+[![Go Walker](http://gowalker.org/api/v1/badge)](http://gowalker.org/github.com/shxsun/gobuild)
 
 Go build + pacakge + distributions
 
@@ -8,7 +8,7 @@ There are a lot of golang open souce project, sometime we want to share code, so
 But few website offers golang binary shares. So I created one.
 
 ### How to use
-	-still developing wget gobuild.io/github.com/shxsun/fswatch/v1.0/linux/amd64 -O fswatch.zip-
+	wget gobuild.io/github.com/shxsun/fswatch/v1.0/linux/amd64 -O fswatch.zip
 
 ### .gobuild
 add a file `.gobuild` in the root of project. with content like.
