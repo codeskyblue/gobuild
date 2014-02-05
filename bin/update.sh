@@ -1,7 +1,7 @@
 #!/bin/bash -x
 #
 gopath=$(go env GOPATH)
-gobin=$(go env GOBIN)
+gobin=${GOBIN:-"$gopath/bin"}
 cd $gopath/src/github.com/shxsun/gobuild
 git pull
 go install
