@@ -2,7 +2,6 @@ package main
 
 import (
 	"io/ioutil"
-	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -23,7 +22,6 @@ func UploadFile(localFile string, destName string) (addr string, err error) {
 	if err != nil {
 		return
 	}
-	defer os.Remove(localFile)
 	addr = "http://" + SCOPE + ".qiniudn.com/" + destName
 	return
 }
