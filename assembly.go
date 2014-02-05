@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.google.com/p/go-uuid/uuid"
 	"github.com/Unknwon/cae/zip"
 	"launchpad.net/goyaml"
 )
@@ -40,8 +39,8 @@ func match(bre string, str string) bool {
 	return false
 }
 
-func pkgZip(root string, files []string) (addr string, err error) {
-	tmpFile, err := ioutil.TempFile("tmp", "tmp-")
+func pkgZip(root string, files []string) (path string, err error) {
+	tmpFile, err := ioutil.TempFile("files", "tmp-zip-")
 	if err != nil {
 		return
 	}
@@ -49,7 +48,6 @@ func pkgZip(root string, files []string) (addr string, err error) {
 	if err != nil {
 		return
 	}
-	defer os.Remove(tmpFile.Name())
 
 	z, err := zip.Create(tmpFile.Name())
 	if err != nil {
@@ -82,16 +80,11 @@ func pkgZip(root string, files []string) (addr string, err error) {
 		lg.Error(err)
 		return
 	}
+	return tmpFile.Name(), nil
 
-	// upload
-	if *environment == "development" {
-		return UploadLocal(tmpFile.Name())
-	} else {
-		return UploadFile(tmpFile.Name(), uuid.New()+"/"+filepath.Base(root)+".zip")
-	}
 }
 
-func Package(bins []string, rcfile string) (addr string, err error) {
+func Package(bins []string, rcfile string) (path string, err error) {
 	lg.Debug(bins)
 	data, err := ioutil.ReadFile(rcfile)
 	if err != nil {
@@ -104,7 +97,6 @@ func Package(bins []string, rcfile string) (addr string, err error) {
 		return
 	}
 	dir := filepath.Dir(rcfile)
-	//fmt.Println(dir, ass)
 	fs, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return

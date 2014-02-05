@@ -7,12 +7,16 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"time"
+	"code.google.com/p/go-uuid/uuid"
 
 	beeutils "github.com/astaxie/beego/utils"
 	"github.com/shxsun/gobuild/models"
 	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/gobuild/xsh"
 )
+
+var history = make(map[string]string)
 
 type Job struct {
 	wbc     *utils.WriteBroadcaster
@@ -28,7 +32,8 @@ type Job struct {
 	srcDir string // init
 	sha    string // get
 
-	pid int64 // db
+	pid int64  // db
+	tag string // tag = pid + str(os-arch), set after pid set
 }
 
 func NewJob(project, ref string, os, arch string, wbc *utils.WriteBroadcaster) *Job {
@@ -49,7 +54,7 @@ func NewJob(project, ref string, os, arch string, wbc *utils.WriteBroadcaster) *
 		"PROJECT": project,
 		"GOROOT":  opts.GOROOT,
 	}
-	// enable cgo on current machine
+	// enable cgo on current os-arch
 	if os == runtime.GOOS && arch == runtime.GOARCH {
 		env["CGO_ENABLED"] = "1"
 	}
@@ -121,13 +126,46 @@ func (j *Job) build(os, arch string) (file string, err error) {
 	if os == "windows" {
 		target += ".exe"
 	}
-	//gobin := filepath.Join(j.gopath, "bin")
 	return beeutils.SearchFile(target, j.gobin, filepath.Join(j.gobin, os+"_"+arch))
 }
 
 // achieve and upload
-func (b *Job) pkg(bins []string) (addr string, err error) {
-	return Package(bins, filepath.Join(b.srcDir, ".build"))
+func (b *Job) pack(bins []string) (addr string, err error) {
+	path, err := Package(bins, filepath.Join(b.srcDir, ".build"))
+	if err != nil {
+		return
+	}
+	go func() {
+		defer func() {
+			lg.Debug("delete history:", b.tag)
+			delete(history, b.tag)
+			go func() {
+				// leave 5min gap for unfinished downloading.
+				time.Sleep(time.Minute * 5)
+				//time.Sleep(time.Second * 5)
+				os.Remove(path)
+			}()
+		}()
+		// upload
+		var cdnAddr string
+		var err error
+		if *environment == "development" {
+			cdnAddr, err = UploadLocal(path)
+		} else {
+			cdnAddr, err = UploadFile(path, uuid.New()+"/"+filepath.Base(b.project)+".zip")
+		}
+		if err != nil {
+			return
+		}
+		lg.Debug("upload ok:", cdnAddr)
+		err = models.AddFile(b.pid, b.tag, cdnAddr, "output-")
+		if err != nil {
+			lg.Error(err)
+		}
+	}()
+	tmpAddr := "http://" + opts.Hostname + "/" + path
+	history[b.tag] = tmpAddr
+	return tmpAddr, nil
 }
 
 // remove tmp file
@@ -137,7 +175,7 @@ func (b *Job) clean() (err error) {
 	return
 }
 
-// init + build + pkg + clean
+// init + build + pack + clean
 func (j *Job) Auto() (addr string, err error) {
 	lock := utils.NewNameLock(j.project)
 	lock.Lock()
@@ -157,7 +195,7 @@ func (j *Job) Auto() (addr string, err error) {
 			lg.Warn(er)
 		}
 	}()
-	// download src
+	// download src (in order to get sha)
 	err = j.get()
 	if err != nil {
 		return
@@ -174,10 +212,17 @@ func (j *Job) Auto() (addr string, err error) {
 	} else {
 		j.pid = p.Id
 	}
+	// generate tag for builded-file search
+	j.tag = fmt.Sprintf("%d-%s-%s", j.pid, j.os, j.arch)
 
-	// search build history file
-	tag := j.os + "-" + j.arch
-	f, err := models.SearchFile(j.pid, tag)
+	// search memory history
+	hisAddr, ok := history[j.tag]
+	if ok {
+		return hisAddr, nil
+	}
+	// search database history
+	f, err := models.SearchFile(j.pid, j.tag)
+	lg.Debugf("search db: %v", f)
 	if err == nil {
 		addr = f.Addr
 		return
@@ -188,10 +233,10 @@ func (j *Job) Auto() (addr string, err error) {
 	if err != nil {
 		return
 	}
-	addr, err = j.pkg([]string{file})
+	// package build file(include upload)
+	addr, err = j.pack([]string{file})
 	if err != nil {
 		return
 	}
-	err = models.AddFile(j.pid, tag, addr, "output-")
 	return
 }
