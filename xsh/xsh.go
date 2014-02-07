@@ -31,11 +31,13 @@ func Capture(a ...interface{}) (ret *Return, err error) {
 type Dir string
 
 type Session struct {
-	inj    inject.Injector
-	alias  map[string][]string
-	Env    map[string]string
-	Stdout io.Writer
-	Stderr io.Writer
+	inj     inject.Injector
+	alias   map[string][]string
+	cmds    []*exec.Cmd
+	started bool
+	Env     map[string]string
+	Stdout  io.Writer
+	Stderr  io.Writer
 }
 
 func NewSession(a ...interface{}) *Session {
@@ -64,20 +66,23 @@ func (s *Session) Alias(alias, cmd string, args ...string) {
 	s.alias[alias] = v
 }
 
-func (s *Session) Call(a ...interface{}) error {
+func (s *Session) Command(a ...interface{}) *Session {
 	for _, v := range a {
 		s.inj.Map(v)
 	}
-	values, err := s.inj.Invoke(s.invokeExec)
-	if err != nil {
-		return err
-	}
-	r := values[0]
-	if r.IsNil() {
-		return nil
-	}
-	return r.Interface().(error)
+	s.inj.Invoke(s.appendCmd)
+	return s
 }
+
+func (s *Session) Call(a ...interface{}) error {
+	return s.Command(a...).Run()
+}
+
+/*
+func (s *Session) Exec(cmd string, args ...string) error {
+	return s.Call(cmd, args)
+}
+*/
 
 func (s *Session) Capture(a ...interface{}) (ret *Return, err error) {
 	stdout := new(bytes.Buffer)
@@ -93,7 +98,18 @@ func (s *Session) Capture(a ...interface{}) (ret *Return, err error) {
 	return
 }
 
-func (s *Session) invokeExec(cmd string, args []string, cwd Dir) error {
+func (s *Session) Set(a ...interface{}) *Session {
+	for _, v := range a {
+		s.inj.Map(v)
+	}
+	return s
+}
+
+func (s *Session) appendCmd(cmd string, args []string, cwd Dir) {
+	if s.started {
+		s.started = false
+		s.cmds = make([]*exec.Cmd, 0)
+	}
 	envs := make([]string, 0, len(s.Env))
 	for k, v := range s.Env {
 		envs = append(envs, k+"="+v)
@@ -103,11 +119,8 @@ func (s *Session) invokeExec(cmd string, args []string, cwd Dir) error {
 		cmd = v[0]
 		args = append(v[1:], args...)
 	}
-	//fmt.Println(v, cmd, args)
 	c := exec.Command(cmd, args...)
 	c.Env = envs
 	c.Dir = string(cwd)
-	c.Stdout = s.Stdout
-	c.Stderr = s.Stderr
-	return c.Run()
+	s.cmds = append(s.cmds, c)
 }
