@@ -9,14 +9,14 @@ import (
 	"net/http"
 	"sync"
 	"time"
-	"launchpad.net/goyaml"
 
-	"code.google.com/p/go.net/websocket"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/qiniu/api/conf"
+	"github.com/shxsun/go-websocket"
 	"github.com/shxsun/gobuild/models"
 	"github.com/shxsun/gobuild/utils"
+	"github.com/shxsun/goyaml"
 	"github.com/shxsun/klog"
 )
 

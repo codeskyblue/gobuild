@@ -3,10 +3,11 @@ package models
 import (
 	"fmt"
 	"time"
-	"github.com/lunny/xorm"
-	//_ "github.com/mattn/go-sqlite3"
+
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/lunny/xorm"
 	"github.com/shxsun/klog"
+	//_ "github.com/mattn/go-sqlite3"
 )
 
 var (

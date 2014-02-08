@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"runtime"
 	"time"
-	"code.google.com/p/go-uuid/uuid"
 
 	beeutils "github.com/astaxie/beego/utils"
+	"github.com/shxsun/go-uuid"
 	"github.com/shxsun/gobuild/models"
 	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/gobuild/xsh"

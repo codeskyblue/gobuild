@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/Unknwon/cae/zip"
-	"launchpad.net/goyaml"
+	"github.com/shxsun/goyaml"
 )
 
 // package according .gobuild, return a download url
