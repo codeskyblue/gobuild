@@ -10,9 +10,27 @@ But few website offers golang binary shares. So I created one.
 ### How to use
 	wget gobuild.io/github.com/shxsun/fswatch/v1.0/linux/amd64 -O fswatch.zip
 
-### .gobuild
-add a file `.gobuild` in the root of project. with content like.
+### .gobuild (optional)
+use `.gobuild` file, you can use more function with gobuild.io.
 
+first you need to add a file `.gobuild` into project root.
+
+`.gobuild` is just a yaml file. specified with which file should be included and excluded.
+
+for example. If I want to add static and LICENSE and exclude README.md. `.gobuild` can be write with
+
+	filesets:
+		includes:
+			- static
+			- LICENSE
+		excludes:
+			- README.md
+
+binary file is defaulted added, you don't need to worry about it.
+
+if no `.gobuild` file found in your project. A default `.gobuild` file will be used.
+
+	# default
 	filesets:
 		includes:
 			- static
@@ -20,8 +38,6 @@ add a file `.gobuild` in the root of project. with content like.
 			- LICENSE
 		excludes:
 			- .svn
-
-directory `static README.* LICENSE` will be packaged in <http://gobuild.io>
 
 -------------------
 ### For developers
