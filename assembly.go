@@ -86,8 +86,10 @@ func pkgZip(root string, files []string) (path string, err error) {
 
 func Package(bins []string, rcfile string) (path string, err error) {
 	lg.Debug(bins)
+	lg.Debug(rcfile)
 	data, err := ioutil.ReadFile(rcfile)
 	if err != nil {
+		lg.Error(err)
 		lg.Debug("use default rc")
 		data = []byte(defaultRc)
 	}

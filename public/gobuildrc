@@ -1,0 +1,8 @@
+# default .gobuild
+filesets:
+    includes:
+        - README.md
+        - LICENSE
+        - CHANGELOG
+    excludes:
+        - .svn

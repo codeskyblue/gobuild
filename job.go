@@ -131,7 +131,7 @@ func (j *Job) build(os, arch string) (file string, err error) {
 
 // achieve and upload
 func (b *Job) pack(bins []string) (addr string, err error) {
-	path, err := Package(bins, filepath.Join(b.srcDir, ".build"))
+	path, err := Package(bins, filepath.Join(b.srcDir, ".gobuild"))
 	if err != nil {
 		return
 	}
