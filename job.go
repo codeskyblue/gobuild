@@ -91,16 +91,16 @@ func (b *Job) get() (err error) {
 	if err != nil {
 		return
 	}
-	// fetch branch
-	err = b.sh.Call("git", []string{"fetch", "origin"})
-	if err != nil {
-		return
-	}
 	if b.ref == "-" {
 		b.ref = "master"
 	}
-	err = b.sh.Call("git", []string{"checkout", "-q", b.ref})
-	if err != nil {
+	if err = b.sh.Call("git", []string{"fetch", "origin"}); err != nil {
+		return
+	}
+	if err = b.sh.Call("git", []string{"checkout", "-q", b.ref}); err != nil {
+		return
+	}
+	if err = b.sh.Call("git", []string{"merge", "origin/" + b.ref}); err != nil {
 		return
 	}
 	r, err := xsh.Capture("git", []string{"rev-parse", "HEAD"}, xsh.Dir(b.srcDir))
