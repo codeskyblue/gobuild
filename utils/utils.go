@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"launchpad.net/goyaml"
+	"github.com/shxsun/goyaml"
 )
 
 func Debugf(format string, a ...interface{}) {
