@@ -1,6 +1,16 @@
 package models
 
-import "testing"
+import (
+	"log"
+	"testing"
+)
+
+func init() {
+	err := InitDB("mysql", "root@/gobuild")
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 /*
 func TestSyncProject(t *testing.T) {

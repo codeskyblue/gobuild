@@ -28,6 +28,20 @@ func InitRouter() {
 		http.Redirect(w, r, addr, http.StatusTemporaryRedirect)
 	})
 
+	m.Get("/github.com/**", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
+		newAddr := "/download/github.com/" + p["_1"]
+		http.Redirect(w, r, newAddr, http.StatusTemporaryRedirect)
+	})
+
+	m.Get("/download/**", func(params martini.Params, r render.Render) {
+		addr := params["_1"]
+		r.HTML(200, "download", map[string]interface{}{
+			"Project":  addr,
+			"Hostname": opts.Hostname,
+			"Name":     filepath.Base(addr),
+		})
+	})
+
 	/*
 		m.Get("/github.com/:account/:proj/:ref/:goos/:goarch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
 			var err error
@@ -114,14 +128,4 @@ func InitRouter() {
 		})
 	*/
 
-	m.Get("/download/**", func(params martini.Params, r render.Render) {
-		addr := params["_1"]
-		r.HTML(200, "download", map[string]interface{}{
-			"Project":  addr,
-			"Hostname": opts.Hostname,
-			"Name":     filepath.Base(addr),
-			//	"CDN":     opts.CDN,
-			//	"Files":   files,
-		})
-	})
 }

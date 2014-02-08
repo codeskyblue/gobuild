@@ -15,6 +15,7 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/qiniu/api/conf"
+	"github.com/shxsun/gobuild/models"
 	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/klog"
 )
@@ -115,29 +116,12 @@ func WsBuildServer(ws *websocket.Conn) {
 	}
 }
 
-/*
-var (
-	opts struct {
-		ConfigFile string `short:"f" long:"file" description:"configuration file" default:"app.ini"`
-
-		ListenAddr string `short:"l" long:"listen" description:"server listen address" default:":3000"`
-		Hostname   string `short:"H" long:"host" description:"hostname like gobuild.io" default:"localhost"`
-		GOROOT     string `short:"r" long:"goroot" description:"set GOROOT path"`
-
-		Server   string `short:"s" long:"serverAddr"`
-		WsServer string `short:"w" long:"wsAddr"`
-		CDN      string `short:"c" long:"cdn"`
-	}
-	args []string
-
-	listenAddr = ""
-)
-*/
-
 type Configuration struct {
 	Hostname   string `yaml:"hostname"`
 	ListenAddr string `yaml:"listen"`
 	GOROOT     string `yaml:"goroot"`
+	Driver     string `yaml:"driver"`
+	DataSource string `yaml:"data_source"`
 	AccessKey  string `yaml:"access_key"`
 	SecretKey  string `yaml:"secret_key"`
 }
@@ -146,37 +130,6 @@ type config struct {
 	Development Configuration `yaml:"development"`
 	Production  Configuration `yaml:"production"`
 }
-
-/*
-func parseConfig() (err error) {
-	parser := flags.NewParser(&opts, flags.Default)
-	args, err = flags.Parse(&opts)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	err = flags.NewIniParser(parser).ParseFile(opts.ConfigFile)
-	if err != nil {
-		return
-	}
-
-	// change to localhost:port
-	if opts.Hostname == "localhost" {
-		opts.Hostname += opts.ListenAddr[strings.Index(opts.ListenAddr, ":"):]
-	}
-
-	// FIXME: below code need to be deleted
-	if opts.CDN == "" {
-		opts.CDN = "http://" + opts.Server + "/files"
-	}
-	if opts.WsServer == "" {
-		opts.WsServer = "ws://" + opts.Server
-	}
-	sepIndex := strings.Index(opts.Server, ":")
-	listenAddr = opts.Server[sepIndex:]
-	return err
-}
-*/
 
 var (
 	m           = martini.Classic()
@@ -218,6 +171,10 @@ func init() {
 
 func main() {
 	var err error
+	err = models.InitDB(opts.Driver, opts.DataSource)
+	if err != nil {
+		lg.Fatal(err)
+	}
 	lg.Info("gobuild service stated ...")
 
 	http.Handle("/", m)

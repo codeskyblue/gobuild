@@ -2,31 +2,26 @@ package models
 
 import (
 	"fmt"
-	"path/filepath"
 	"time"
-
-	"github.com/astaxie/beego/utils"
 	"github.com/lunny/xorm"
-	_ "github.com/mattn/go-sqlite3"
+	//_ "github.com/mattn/go-sqlite3"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/shxsun/klog"
 )
 
 var (
-	dbName = filepath.Join(utils.SelfDir(), "./sqlite.db")
-	x      *xorm.Engine
-	lg     = klog.DevLog
+	//dbName = filepath.Join(utils.SelfDir(), "./sqlite.db")
+	x  *xorm.Engine
+	lg = klog.DevLog
 )
 
-func init() {
-	var err error
-	x, err = xorm.NewEngine("sqlite3", dbName)
+func InitDB(driver, dataSource string) (err error) {
+	x, err = xorm.NewEngine(driver, dataSource) //"sqlite3", dbName)
 	if err != nil {
-		lg.Fatal(err)
+		return
 	}
 	// create tables
-	if err = x.Sync(new(Project), new(File)); err != nil {
-		lg.Fatal(err)
-	}
+	return x.Sync(new(Project), new(File))
 }
 
 type Project struct {

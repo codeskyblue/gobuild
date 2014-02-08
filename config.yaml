@@ -2,15 +2,15 @@
 development:
     hostname: localhost:3000
     listen: 0.0.0.0:3000 
-    driver: sqlite3
-    data_source: ./sqlite.db
+    driver: mysql
+    data_source: root@/gobuild
     goroot: /Users/skyblue/go
 
 production:
     hostname: gobuild.io
     listen: 0.0.0.0:3000
-    driver: sqlite3
-    data_source: ./sqlite.db
+    driver: mysql
+    data_source: root:toor@skyblue/gobuild
     goroot: /usr/local/go 
     # qiniu
     access_key: BgESh3GconLxVmqlkM19U3ANknrCsTWwIx67S3fo
