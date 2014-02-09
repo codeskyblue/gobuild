@@ -33,7 +33,13 @@
 
 	<hr/>
 	<p>
-		<input type="input" id="wgetaddr" class="col-md-12" onclick="this.select()" value="wget http://{{.Hostname}}/{{.Project}}/master/windows/amd64 -O output.zip" />
+		<input type="input" id="wgetaddr" class="col-md-12" onclick="this.select()" value="" />
+	</p>
+	<p>
+		<input type="input" id="curladdr" class="col-md-12" onclick="this.select()" value="" />
+	</p>
+	<p>
+		<a id="clickaddr" class="btn btn-default" href="#"><span class="glyphicon glyphicon-arrow-down"></span> click to download</a>
 	</p>
 
 	<!--
@@ -44,13 +50,21 @@
 	-->
 	<script>
 	$(function(){
-		$wget = $("#wgetaddr");
-		$("form").change(function(){
+		var $wget = $("#wgetaddr");
+		var $curl = $("#curladdr");
+		var $click = $("#clickaddr");
+		var autoAddr = function(){
 			os = $(":input[name=os]:checked").val();
 			arch = $(":input[name=arch]:checked").val();
-			$wget.val("wget http://{{.Hostname}}/{{.Project}}/master/"+os+"/"+arch + " -O output.zip");
-		});
+			var link = "http://{{.Hostname}}/{{.Project}}/master/"+os+"/"+arch;
+			$click.attr("href", link);
+			$wget.val("wget " + link + " -O output.zip");
+			$curl.val("curl -L " + link + " -o output.zip");
+		};
+		autoAddr();
+		$("form").change(autoAddr);
 	});
 	</script>
+	<p>compile need some time, please be patient</p>
 </div>
 

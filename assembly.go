@@ -7,11 +7,13 @@ import (
 	"strings"
 
 	"github.com/Unknwon/cae/zip"
+	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/goyaml"
 )
 
 // package according .gobuild, return a download url
 // format: <tgz|zip>
+/*
 var defaultRc = `---
 filesets:
     includes:
@@ -21,6 +23,7 @@ filesets:
     excludes:
         - .svn
 `
+*/
 
 type FileSet struct {
 	Includes []string `yaml:"includes"`
@@ -40,16 +43,12 @@ func match(bre string, str string) bool {
 }
 
 func pkgZip(root string, files []string) (path string, err error) {
-	tmpFile, err := ioutil.TempFile("files", "tmp-zip-")
-	if err != nil {
-		return
-	}
-	err = tmpFile.Close()
+	tmpFile, err := utils.TempFile("files", "tmp-", "-"+filepath.Base(root)+".zip")
 	if err != nil {
 		return
 	}
 
-	z, err := zip.Create(tmpFile.Name())
+	z, err := zip.Create(tmpFile)
 	if err != nil {
 		return
 	}
@@ -80,7 +79,7 @@ func pkgZip(root string, files []string) (path string, err error) {
 		lg.Error(err)
 		return
 	}
-	return tmpFile.Name(), nil
+	return tmpFile, nil
 
 }
 
@@ -91,7 +90,11 @@ func Package(bins []string, rcfile string) (path string, err error) {
 	if err != nil {
 		lg.Error(err)
 		lg.Debug("use default rc")
-		data = []byte(defaultRc)
+		data, err = ioutil.ReadFile("public/gobuildrc")
+		if err != nil {
+			lg.Error(err)
+		}
+		////data = []byte(defaultRc)
 	}
 	ass := new(Assembly)
 	err = goyaml.Unmarshal(data, ass)

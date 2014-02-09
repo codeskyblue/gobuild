@@ -2,17 +2,8 @@ package main
 
 import "testing"
 
-var sample_yaml = `---
-filesets:
-    includes:
-        - public
-        - README.*
-    excludes:
-        - .svn
-`
-
 func TestPackage(t *testing.T) {
-	addr, err := Package([]string{"README.md"}, "gobuildrc")
+	addr, err := Package([]string{"README.md"}, "public/gobuildrc")
 	if err != nil {
 		t.Fatal(err)
 	}
