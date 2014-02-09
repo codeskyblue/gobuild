@@ -42,6 +42,8 @@ func InitRouter() {
 		})
 	})
 
+	initBadge()
+
 	/*
 		m.Get("/github.com/:account/:proj/:ref/:goos/:goarch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
 			var err error
