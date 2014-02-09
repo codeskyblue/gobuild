@@ -23,7 +23,7 @@ var (
 )
 
 func initBadge() {
-	m.Get("/:web/:name/:p/badge.png", func(w http.ResponseWriter, r *http.Request) {
+	m.Get("/badge/:web/:name/:p/download.png", func(w http.ResponseWriter, r *http.Request) {
 		var err error
 		img := image.NewNRGBA(image.Rect(0, 0, 180, 16))
 		fontBytes, err := ioutil.ReadFile(fontFile)
