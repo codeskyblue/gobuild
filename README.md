@@ -30,29 +30,28 @@ binary file is defaulted added, you don't need to worry about it.
 
 if no `.gobuild` file found in your project. A default `.gobuild` file will be used.
 
-	# default
-	filesets:
-		includes:
-			- static
-			- README.*
-			- LICENSE
-		excludes:
-			- .svn
+*for beego and revel project* `.gobuild` file should like this.
+
+	framework: beego
+	# or framework: revel
+
+beego will use `bee pack`, and revel use `revel pack`(revel unfinished)
+
+see [default gobuildrc](public/gobuildrc)
 
 -------------------
 ### For developers
 #### Prepare dependencies
-	go get github.com/mitchellh/gox
-	
-	# build toolchain
-	gox -build-toolchain
+	go get -d github.com/shxsun/gobuild
+	# cd github.com/shxsun/gobuild
+	bin/install.sh
+	# config file: config.yaml
+	./gobuild
 
-#### setup
-	go get github.com/shxsun/gobuild
-	
-	# update config.yaml
-	go build && ./gobuild
-	
+2 example project, which contains `.gobuild`
+
+* github.com/shxsun/gobuild-beegotest
+* github.com/shxsun/gobuild-reveltest
 
 ### related package
 * web framework: <https://github.com/codegangsta/martini>
@@ -63,9 +62,9 @@ if no `.gobuild` file found in your project. A default `.gobuild` file will be u
 
 ### Q/A(knownen issues)
 ##### not support os/user
+*golang's cross compile not support CGO, but package os/user use CGO.*
 
-	golang's cross compile not support CGO, but package os/user use CGO.
-	sulutions: use environment variables to get use-name <http://stackoverflow.com/questions/7922270/obtain-users-home-directory>
+sulutions: use environment variables to get use-name <http://stackoverflow.com/questions/7922270/obtain-users-home-directory>
 
 ### Contributers
 * [skyblue](https://github.com/shxsun)

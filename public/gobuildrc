@@ -1,4 +1,5 @@
 # default .gobuild
+#framework: none
 filesets:
     includes:
         - README.md

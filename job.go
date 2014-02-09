@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 
 	beeutils "github.com/astaxie/beego/utils"
@@ -27,36 +28,38 @@ type Job struct {
 	os      string
 	arch    string
 
-	gopath string    // init
-	gobin  string    // init
-	srcDir string    // init
-	sha    string    // get
-	rc     *Assembly // get
+	gopath    string    // init
+	gobin     string    // init
+	srcDir    string    // init
+	sha       string    // get
+	rc        *Assembly // get
+	framework string    // build
 
 	pid int64  // db
 	tag string // tag = pid + str(os-arch), set after pid set
 }
 
-func NewJob(project, ref string, os, arch string, wbc *utils.WriteBroadcaster) *Job {
+func NewJob(project, ref string, goos, arch string, wbc *utils.WriteBroadcaster) *Job {
 	b := &Job{
 		wbc:     wbc,
 		sh:      sh.NewSession(),
 		project: project,
 		ref:     ref,
-		os:      os,
+		os:      goos,
 		arch:    arch,
 	}
 	if wbc != nil {
 		b.sh.Stdout = wbc
 		b.sh.Stderr = wbc
 	}
+	selfbin := beeutils.SelfDir() + "/bin"
 	env := map[string]string{
-		"PATH":    "/bin:/usr/bin:/usr/local/bin",
+		"PATH":    "/bin:/usr/bin:/usr/local/bin:" + selfbin,
 		"PROJECT": project,
 		"GOROOT":  opts.GOROOT,
 	}
 	// enable cgo on current os-arch
-	if os == runtime.GOOS && arch == runtime.GOARCH {
+	if goos == runtime.GOOS && arch == runtime.GOARCH {
 		env["CGO_ENABLED"] = "1"
 	}
 
@@ -84,6 +87,21 @@ func (j *Job) build(os, arch string) (file string, err error) {
 	j.sh.Env["GOOS"] = os
 	j.sh.Env["GOARCH"] = arch
 
+	// switch framework
+	j.framework = j.rc.Framework
+	switch j.rc.Framework {
+	case "beego":
+		err = j.sh.Set(sh.Dir(j.srcDir)).Call("bee", []string{"pack", "-f", "zip"})
+		file = filepath.Join(j.srcDir, filepath.Base(j.project)) + ".zip"
+		return
+	case "revel":
+		err = j.sh.Set(sh.Dir(j.srcDir)).Call("revel", []string{"package", j.project})
+		file = filepath.Join(j.srcDir, filepath.Base(j.project)) + ".tar.gz"
+		return
+	default:
+		j.framework = ""
+	}
+
 	err = j.sh.Call("go", []string{"get", "-u", "-v", "."})
 	if err != nil {
 		return
@@ -97,10 +115,25 @@ func (j *Job) build(os, arch string) (file string, err error) {
 }
 
 // achieve and upload
-func (b *Job) publish(bins []string) (addr string, err error) {
-	path, err := b.pack(bins, filepath.Join(b.srcDir, ".gobuild"))
+func (b *Job) publish(file string) (addr string, err error) {
+	var path string
+	if b.framework == "" {
+		path, err = b.pack([]string{file}, filepath.Join(b.srcDir, ".gobuild"))
+	} else {
+		path, err = utils.TempFile("files", "tmp-", "-"+filepath.Base(file))
+		if err != nil {
+			return
+		}
+		_, err = sh.Capture("mv", []string{"-v", file, path})
+	}
 	if err != nil {
 		return
+	}
+
+	// file ext<zip|tar.gz>
+	suffix := ".zip"
+	if strings.HasSuffix(path, ".tar.gz") {
+		suffix = ".tar.gz"
 	}
 	go func() {
 		defer func() {
@@ -119,7 +152,7 @@ func (b *Job) publish(bins []string) (addr string, err error) {
 		if *environment == "development" {
 			cdnAddr, err = UploadLocal(path)
 		} else {
-			cdnAddr, err = UploadFile(path, uuid.New()+"/"+filepath.Base(b.project)+".zip")
+			cdnAddr, err = UploadFile(path, uuid.New()+"/"+filepath.Base(b.project)+suffix)
 		}
 		if err != nil {
 			return
@@ -167,7 +200,7 @@ func (j *Job) Auto() (addr string, err error) {
 	if err != nil {
 		return
 	}
-	// search db for history data
+	// search db for history project record
 	p, err := models.SearchProject(j.project, j.sha)
 	if err != nil {
 		pid, er := models.AddProject(j.project, j.ref, j.sha)
@@ -194,14 +227,16 @@ func (j *Job) Auto() (addr string, err error) {
 		addr = f.Addr
 		return
 	}
+
 	// build xc
 	j.sh.Call("echo", "building")
 	file, err := j.build(j.os, j.arch)
 	if err != nil {
 		return
 	}
+	//}
 	// package build file(include upload)
-	addr, err = j.publish([]string{file})
+	addr, err = j.publish(file)
 	if err != nil {
 		return
 	}

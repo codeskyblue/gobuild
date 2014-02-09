@@ -1,6 +1,11 @@
 package main
 
-import "github.com/shxsun/go-sh"
+import (
+	"io/ioutil"
+	"path/filepath"
+	"github.com/shxsun/go-sh"
+	"launchpad.net/goyaml"
+)
 import beeutils "github.com/astaxie/beego/utils"
 
 // download src
@@ -34,8 +39,17 @@ func (b *Job) get() (err error) {
 		return
 	}
 	b.sha = r.Trim()
+
 	// parse .gobuild
-	//rcpath := filepath.Join(b.srcDir, ".gobuild"))
-	//if rcpath
+	b.rc = new(Assembly)
+	rcfile := "public/gobuildrc"
+	if b.sh.Test("f", ".gobuild") {
+		rcfile = filepath.Join(b.srcDir, ".gobuild")
+	}
+	data, err := ioutil.ReadFile(rcfile)
+	if err != nil {
+		return
+	}
+	err = goyaml.Unmarshal(data, b.rc)
 	return
 }
