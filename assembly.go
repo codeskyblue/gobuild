@@ -11,27 +11,14 @@ import (
 	"github.com/shxsun/goyaml"
 )
 
-// package according .gobuild, return a download url
-// format: <tgz|zip>
-/*
-var defaultRc = `---
-filesets:
-    includes:
-        - static
-        - README.*
-        - LICENSE
-    excludes:
-        - .svn
-`
-*/
-
 type FileSet struct {
 	Includes []string `yaml:"includes"`
 	Excludes []string `yaml:"excludes"`
 }
 
 type Assembly struct {
-	FileSet `yaml:"filesets"`
+	Framework string `yaml:"framework"`
+	FileSet   `yaml:"filesets"`
 }
 
 // basic regrex match
@@ -83,7 +70,7 @@ func pkgZip(root string, files []string) (path string, err error) {
 
 }
 
-func Package(bins []string, rcfile string) (path string, err error) {
+func (b *Job) pack(bins []string, rcfile string) (path string, err error) {
 	lg.Debug(bins)
 	lg.Debug(rcfile)
 	data, err := ioutil.ReadFile(rcfile)
@@ -94,7 +81,6 @@ func Package(bins []string, rcfile string) (path string, err error) {
 		if err != nil {
 			lg.Error(err)
 		}
-		////data = []byte(defaultRc)
 	}
 	ass := new(Assembly)
 	err = goyaml.Unmarshal(data, ass)

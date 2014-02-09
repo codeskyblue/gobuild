@@ -10,10 +10,10 @@ import (
 	"time"
 
 	beeutils "github.com/astaxie/beego/utils"
+	"github.com/shxsun/go-sh"
 	"github.com/shxsun/go-uuid"
 	"github.com/shxsun/gobuild/models"
 	"github.com/shxsun/gobuild/utils"
-	"github.com/shxsun/gobuild/xsh"
 )
 
 var history = make(map[string]string)
@@ -21,16 +21,17 @@ var history = make(map[string]string)
 type Job struct {
 	wbc     *utils.WriteBroadcaster
 	cmd     *exec.Cmd
-	sh      *xsh.Session
+	sh      *sh.Session
 	project string //
 	ref     string
 	os      string
 	arch    string
 
-	gopath string // init
-	gobin  string // init
-	srcDir string // init
-	sha    string // get
+	gopath string    // init
+	gobin  string    // init
+	srcDir string    // init
+	sha    string    // get
+	rc     *Assembly // get
 
 	pid int64  // db
 	tag string // tag = pid + str(os-arch), set after pid set
@@ -39,7 +40,7 @@ type Job struct {
 func NewJob(project, ref string, os, arch string, wbc *utils.WriteBroadcaster) *Job {
 	b := &Job{
 		wbc:     wbc,
-		sh:      xsh.NewSession(),
+		sh:      sh.NewSession(),
 		project: project,
 		ref:     ref,
 		os:      os,
@@ -77,40 +78,6 @@ func (b *Job) init() (err error) {
 	return
 }
 
-// download src
-func (b *Job) get() (err error) {
-	exists := beeutils.FileExists(b.srcDir)
-	if !exists {
-		b.sh.Call("echo", []string{"downloading src"})
-		err = b.sh.Call("go", []string{"get", "-v", "-d", b.project})
-		if err != nil {
-			return
-		}
-	}
-	err = b.sh.Call("echo", []string{"fetch", b.ref}, xsh.Dir(b.srcDir))
-	if err != nil {
-		return
-	}
-	if b.ref == "-" {
-		b.ref = "master"
-	}
-	if err = b.sh.Call("git", []string{"fetch", "origin"}); err != nil {
-		return
-	}
-	if err = b.sh.Call("git", []string{"checkout", "-q", b.ref}); err != nil {
-		return
-	}
-	if err = b.sh.Call("git", []string{"merge", "origin/" + b.ref}); err != nil {
-		return
-	}
-	r, err := xsh.Capture("git", []string{"rev-parse", "HEAD"}, xsh.Dir(b.srcDir))
-	if err != nil {
-		return
-	}
-	b.sha = r.Trim()
-	return
-}
-
 // build src
 func (j *Job) build(os, arch string) (file string, err error) {
 	fmt.Println(j.sh.Env)
@@ -130,8 +97,8 @@ func (j *Job) build(os, arch string) (file string, err error) {
 }
 
 // achieve and upload
-func (b *Job) pack(bins []string) (addr string, err error) {
-	path, err := Package(bins, filepath.Join(b.srcDir, ".gobuild"))
+func (b *Job) publish(bins []string) (addr string, err error) {
+	path, err := b.pack(bins, filepath.Join(b.srcDir, ".gobuild"))
 	if err != nil {
 		return
 	}
@@ -175,7 +142,7 @@ func (b *Job) clean() (err error) {
 	return
 }
 
-// init + build + pack + clean
+// init + build + publish + clean
 func (j *Job) Auto() (addr string, err error) {
 	lock := utils.NewNameLock(j.project)
 	lock.Lock()
@@ -234,7 +201,7 @@ func (j *Job) Auto() (addr string, err error) {
 		return
 	}
 	// package build file(include upload)
-	addr, err = j.pack([]string{file})
+	addr, err = j.publish([]string{file})
 	if err != nil {
 		return
 	}
