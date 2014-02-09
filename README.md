@@ -40,6 +40,14 @@ beego will use `bee pack`, and revel use `revel pack`(revel unfinished)
 
 see [default gobuildrc](public/gobuildrc)
 
+### add badge
+assume you project address is github.com/shxsun/gobuild
+
+and your png address: <http://gobuild.io/badge/github.com/shxsun/gobuild/download.png>
+
+Markdown link is link below
+
+	[![Gobuild Download](http://gobuild.io/badge/github.com/shxsun/gobuild/download.png)](http://gobuild.io/github.com/shxsun/gobuild)
 -------------------
 ### For developers
 #### Prepare dependencies
