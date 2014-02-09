@@ -13,19 +13,19 @@ import (
 
 const (
 	fontFile = "bin/font.ttf"
-	fontSize = 12
+	fontSize = 10
 	fontDPI  = 72
 )
 
 var (
-	black color.Color = color.RGBA{0, 0, 0, 255}
-	green color.Color = color.RGBA{0, 255, 0, 255}
+	black color.Color = color.RGBA{50, 50, 50, 255}
+	green color.Color = color.RGBA{140, 170, 50, 255}
 )
 
 func initBadge() {
 	m.Get("/badge/:web/:name/:p/download.png", func(w http.ResponseWriter, r *http.Request) {
 		var err error
-		img := image.NewNRGBA(image.Rect(0, 0, 180, 16))
+		img := image.NewNRGBA(image.Rect(0, 0, 180, 18))
 		fontBytes, err := ioutil.ReadFile(fontFile)
 		if err != nil {
 			return
@@ -36,7 +36,7 @@ func initBadge() {
 		}
 		left, right := img.Bounds(), img.Bounds()
 		const middle = 65
-		left.Max = image.Pt(middle, 16)
+		left.Max = image.Pt(middle, 18)
 		right.Min = image.Pt(middle, 0)
 		// fill left(black) right(green)
 		draw.Draw(img, left, &image.Uniform{black}, image.ZP, draw.Src)
