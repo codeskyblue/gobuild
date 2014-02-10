@@ -134,6 +134,7 @@ type config struct {
 var (
 	m           = martini.Classic()
 	environment = flag.String("e", "development", "select environment <development|production>")
+	secure      = flag.Bool("secure", false, "use secure connection")
 	opts        *Configuration
 )
 
@@ -169,6 +170,10 @@ func init() {
 	InitRouter()
 }
 
+func HelloServer(w http.ResponseWriter, req *http.Request) {
+	io.WriteString(w, "hello, world!\n")
+}
+
 func main() {
 	var err error
 	err = models.InitDB(opts.Driver, opts.DataSource)
@@ -179,8 +184,14 @@ func main() {
 
 	http.Handle("/", m)
 	http.Handle("/websocket", websocket.Handler(WsBuildServer))
+	http.HandleFunc("/hello", HelloServer)
 
-	if err = http.ListenAndServe(opts.ListenAddr, nil); err != nil {
+	if *secure {
+		err = http.ListenAndServeTLS(opts.ListenAddr, "bin/ssl.crt", "bin/ssl.key", nil)
+	} else {
+		err = http.ListenAndServe(opts.ListenAddr, nil)
+	}
+	if err != nil {
 		lg.Fatal(err)
 	}
 }
