@@ -73,7 +73,7 @@ Markdown link is link below
 ##### not support os/user
 *golang's cross compile not support CGO, but package os/user use CGO.*
 
-sulutions: use environment variables to get use-name <http://stackoverflow.com/questions/7922270/obtain-users-home-directory>
+solutions: use environment variables to get use-name <http://stackoverflow.com/questions/7922270/obtain-users-home-directory>
 
 ### Contributers
 * [skyblue](https://github.com/shxsun)
