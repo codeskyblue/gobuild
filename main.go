@@ -187,10 +187,14 @@ func main() {
 	http.HandleFunc("/hello", HelloServer)
 
 	if *secure {
-		err = http.ListenAndServeTLS(opts.ListenAddr, "bin/ssl.crt", "bin/ssl.key", nil)
-	} else {
-		err = http.ListenAndServe(opts.ListenAddr, nil)
+		go func() {
+			er := http.ListenAndServeTLS(":443", "bin/ssl.crt", "bin/ssl.key", nil)
+			if er != nil {
+				lg.Error(er)
+			}
+		}()
 	}
+	err = http.ListenAndServe(opts.ListenAddr, nil)
 	if err != nil {
 		lg.Fatal(err)
 	}
