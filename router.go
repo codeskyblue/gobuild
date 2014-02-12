@@ -19,7 +19,7 @@ func InitRouter() {
 		project := "github.com/" + p["account"] + "/" + p["proj"]
 		ref := p["ref"]
 		os, arch := p["os"], p["arch"]
-		job := NewJob(project, ref, os, arch, nil)
+		job := NewBuilder(project, ref, os, arch, nil)
 		addr, err := job.Auto()
 		if err != nil {
 			lg.Error(err)

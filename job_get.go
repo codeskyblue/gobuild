@@ -9,7 +9,7 @@ import (
 import beeutils "github.com/astaxie/beego/utils"
 
 // download src
-func (b *Job) get() (err error) {
+func (b *Builder) get() (err error) {
 	exists := beeutils.FileExists(b.srcDir)
 	if !exists {
 		b.sh.Call("echo", []string{"downloading src"})

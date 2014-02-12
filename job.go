@@ -19,7 +19,7 @@ import (
 
 var history = make(map[string]string)
 
-type Job struct {
+type Builder struct {
 	wbc     *utils.WriteBroadcaster
 	cmd     *exec.Cmd
 	sh      *sh.Session
@@ -39,8 +39,8 @@ type Job struct {
 	tag string // tag = pid + str(os-arch), set after pid set
 }
 
-func NewJob(project, ref string, goos, arch string, wbc *utils.WriteBroadcaster) *Job {
-	b := &Job{
+func NewBuilder(project, ref string, goos, arch string, wbc *utils.WriteBroadcaster) *Builder {
+	b := &Builder{
 		wbc:     wbc,
 		sh:      sh.NewSession(),
 		project: project,
@@ -68,7 +68,7 @@ func NewJob(project, ref string, goos, arch string, wbc *utils.WriteBroadcaster)
 }
 
 // prepare environ
-func (b *Job) init() (err error) {
+func (b *Builder) init() (err error) {
 	gobin, err := ioutil.TempDir("tmp", "gobin-")
 	if err != nil {
 		return
@@ -82,7 +82,7 @@ func (b *Job) init() (err error) {
 }
 
 // build src
-func (j *Job) build(os, arch string) (file string, err error) {
+func (j *Builder) build(os, arch string) (file string, err error) {
 	fmt.Println(j.sh.Env)
 	j.sh.Env["GOOS"] = os
 	j.sh.Env["GOARCH"] = arch
@@ -115,7 +115,7 @@ func (j *Job) build(os, arch string) (file string, err error) {
 }
 
 // achieve and upload
-func (b *Job) publish(file string) (addr string, err error) {
+func (b *Builder) publish(file string) (addr string, err error) {
 	var path string
 	if b.framework == "" {
 		path, err = b.pack([]string{file}, filepath.Join(b.srcDir, ".gobuild"))
@@ -169,14 +169,14 @@ func (b *Job) publish(file string) (addr string, err error) {
 }
 
 // remove tmp file
-func (b *Job) clean() (err error) {
+func (b *Builder) clean() (err error) {
 	b.sh.Call("echo", []string{"cleaning..."})
 	err = os.RemoveAll(b.gobin)
 	return
 }
 
 // init + build + publish + clean
-func (j *Job) Auto() (addr string, err error) {
+func (j *Builder) Auto() (addr string, err error) {
 	lock := utils.NewNameLock(j.project)
 	lock.Lock()
 	defer func() {

@@ -34,7 +34,7 @@ var (
 type Project struct {
 	BufferStr string
 	Reader    io.ReadCloser
-	job       *Job
+	job       *Builder
 }
 
 func (p *Project) Close() {
@@ -51,7 +51,7 @@ func NewProject(addr, name string) *Project {
 
 		// start compiling job
 		go func() {
-			_, err := NewJob(addr, "-", "linux", "amd64", wc).Auto()
+			_, err := NewBuilder(addr, "-", "linux", "amd64", wc).Auto()
 			if err != nil {
 				lg.Error(err)
 			}

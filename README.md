@@ -63,8 +63,9 @@ Markdown link is link below
 * github.com/shxsun/gobuild-reveltest
 
 ### related package
+* xorm: <https://github.com/lunny/xorm>
 * web framework: <https://github.com/codegangsta/martini>
-* xsh use: <https://github.com/codegangsta/inject>
+* go-sh: <https://github.com/shxsun/go-sh>
 * zip archive support: <https://github.com/Unknwon/cae>
 * golang cross compile <https://github.com/mitchellh/gox>
 * ...

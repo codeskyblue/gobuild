@@ -70,7 +70,7 @@ func pkgZip(root string, files []string) (path string, err error) {
 
 }
 
-func (b *Job) pack(bins []string, rcfile string) (path string, err error) {
+func (b *Builder) pack(bins []string, rcfile string) (path string, err error) {
 	lg.Debug(bins)
 	lg.Debug(rcfile)
 	data, err := ioutil.ReadFile(rcfile)
