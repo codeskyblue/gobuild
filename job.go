@@ -54,7 +54,7 @@ func NewBuilder(project, ref string, goos, arch string, wbc *utils.WriteBroadcas
 	}
 	selfbin := beeutils.SelfDir() + "/bin"
 	env := map[string]string{
-		"PATH":    "/bin:/usr/bin:/usr/local/bin:" + selfbin,
+		"PATH":    strings.Join([]string{"/bin:/usr/bin", selfbin, os.Getenv("PATH")}, ":"),
 		"PROJECT": project,
 		"GOROOT":  opts.GOROOT,
 	}
