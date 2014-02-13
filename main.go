@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -31,81 +32,97 @@ var (
 	Arch = []string{"386", "amd64"}
 )
 
-type Project struct {
+type StreamOutput struct {
 	BufferStr string
 	Reader    io.ReadCloser
 	job       *Builder
 }
 
-func (p *Project) Close() {
+func (p *StreamOutput) Close() {
 	p.Reader.Close()
 }
 
-func NewProject(addr, name string) *Project {
+func GetWriteBroadcaster(project string) (wc *utils.WriteBroadcaster, newer bool) {
 	mu.Lock()
 	defer mu.Unlock()
-	var wc *utils.WriteBroadcaster
-	if wc = broadcasts[addr]; wc == nil {
+	if wc = broadcasts[project]; wc == nil {
 		wc = utils.NewWriteBroadcaster()
-		broadcasts[addr] = wc
+		broadcasts[project] = wc
+		newer = true
+	}
+	return
+}
 
-		// start compiling job
+func NewStreamOutput(project, branch, goos, goarch string) *StreamOutput {
+	fullname := strings.Join([]string{project, branch, goos, goarch}, "-")
+	wb, newer := GetWriteBroadcaster(fullname)
+	if newer {
 		go func() {
-			_, err := NewBuilder(addr, "-", "linux", "amd64", wc).Auto()
+			// start compiling job
+			_, err := NewBuilder(project, branch, goos, goarch, wb).Auto()
 			if err != nil {
 				lg.Error(err)
 			}
 		}()
 	}
 
-	bufbytes, rd := wc.NewReader(name)
+	bufbytes, rd := wb.NewReader("")
 	reader := utils.NewBufReader(rd)
-	return &Project{
+	return &StreamOutput{
 		BufferStr: string(bufbytes),
 		Reader:    reader,
 	}
 }
 
-type Message struct {
+type SendMsg struct {
 	Error error  `json:"error"`
 	Type  string `json:"type"` // FIXME: how to omited
 	Data  string `json:"data"`
 }
 
+type RecvMsg struct {
+	Project string `json:"project"`
+	Branch  string `json:"branch"`
+	GOOS    string `json:"goos"`
+	GOARCH  string `json:"goarch"`
+}
+
+// output websocket
 func WsBuildServer(ws *websocket.Conn) {
 	defer ws.Close()
 	var err error
-	clientMsg := new(Message)
-	if err = websocket.JSON.Receive(ws, &clientMsg); err != nil {
+	recvMsg := new(RecvMsg)
+	sendMsg := new(SendMsg)
+	err = websocket.JSON.Receive(ws, &recvMsg)
+	if err != nil {
+		sendMsg.Error = err
+		websocket.JSON.Send(ws, sendMsg)
 		utils.Debugf("read json error: %v", err)
 		return
 	}
-	addr := clientMsg.Data
+
 	name := ws.RemoteAddr().String()
-	lg.Debug(addr, name)
+	lg.Debug(name)
 
-	proj := NewProject(addr, name)
-	defer proj.Close()
+	sout := NewStreamOutput(recvMsg.Project, recvMsg.Branch, recvMsg.GOOS, recvMsg.GOARCH)
+	defer sout.Close()
 
-	firstMsg := &Message{
-		Data: proj.BufferStr,
-	}
-	err = websocket.JSON.Send(ws, firstMsg)
+	sendMsg.Data = sout.BufferStr
+	err = websocket.JSON.Send(ws, sendMsg)
 	if err != nil {
-		utils.Debugf("send first msg error: %v", err)
+		utils.Debugf("send first sendMsg error: %v", err)
 		return
 	}
 
 	// send the rest outputs
 	buf := make([]byte, 100)
-	msg := new(Message)
 	for {
-		n, err := proj.Reader.Read(buf)
+		n, err := sout.Reader.Read(buf)
 		if n > 0 {
-			msg.Data = string(buf[:n])
+			sendMsg.Data = string(buf[:n])
 			deadline := time.Now().Add(time.Second * 1)
 			ws.SetWriteDeadline(deadline)
-			if er := websocket.JSON.Send(ws, msg); er != nil {
+			if er := websocket.JSON.Send(ws, sendMsg); er != nil {
 				lg.Debug("write failed timeout, user logout")
 				return
 			}

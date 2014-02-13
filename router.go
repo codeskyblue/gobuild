@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"path/filepath"
+	"strings"
 
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
@@ -19,7 +20,9 @@ func InitRouter() {
 		project := "github.com/" + p["account"] + "/" + p["proj"]
 		ref := p["ref"]
 		os, arch := p["os"], p["arch"]
-		job := NewBuilder(project, ref, os, arch, nil)
+		fullname := strings.Join([]string{project, ref, os, arch}, "-")
+		wb, _ := GetWriteBroadcaster(fullname)
+		job := NewBuilder(project, ref, os, arch, wb)
 		addr, err := job.Auto()
 		if err != nil {
 			lg.Error(err)
@@ -39,6 +42,14 @@ func InitRouter() {
 			"Project":  addr,
 			"Hostname": opts.Hostname,
 			"Name":     filepath.Base(addr),
+		})
+	})
+	m.Get("/build/**", func(params martini.Params, r render.Render) {
+		project := params["_1"]
+		lg.Debug(project, "END")
+		r.HTML(200, "build", map[string]string{
+			"FullName": project,
+			"WsServer": opts.Hostname + "/websocket",
 		})
 	})
 
@@ -97,19 +108,6 @@ func InitRouter() {
 	*/
 
 	/*
-		m.Get("/build/**", func(params martini.Params, r render.Render) {
-			addr := params["_1"]
-			lg.Debug(addr, "END")
-			jsDir := strings.Repeat("../", strings.Count(addr, "/")+1)
-			r.HTML(200, "build", map[string]string{
-				"FullName":       addr,
-				"Name":           filepath.Base(addr),
-				"DownloadPrefix": opts.Hostname,
-				"Server":         opts.Server,
-				"WsServer":       opts.WsServer + "/websocket",
-				"JsDir":          jsDir,
-			})
-		})
 		m.Get("/rebuild/**", func(params martini.Params, r render.Render) {
 			addr := params["_1"]
 			mu.Lock()

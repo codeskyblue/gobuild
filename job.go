@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -20,13 +19,13 @@ import (
 var history = make(map[string]string)
 
 type Builder struct {
-	wbc     *utils.WriteBroadcaster
-	cmd     *exec.Cmd
-	sh      *sh.Session
-	project string //
-	ref     string
-	os      string
-	arch    string
+	wbc      *utils.WriteBroadcaster
+	sh       *sh.Session
+	project  string //
+	ref      string
+	os       string
+	arch     string
+	fullname string // p + ref + os + arch
 
 	gopath    string    // init
 	gobin     string    // init
@@ -41,12 +40,13 @@ type Builder struct {
 
 func NewBuilder(project, ref string, goos, arch string, wbc *utils.WriteBroadcaster) *Builder {
 	b := &Builder{
-		wbc:     wbc,
-		sh:      sh.NewSession(),
-		project: project,
-		ref:     ref,
-		os:      goos,
-		arch:    arch,
+		wbc:      wbc,
+		sh:       sh.NewSession(),
+		project:  project,
+		ref:      ref,
+		os:       goos,
+		arch:     arch,
+		fullname: strings.Join([]string{project, ref, goos, arch}, "-"),
 	}
 	if wbc != nil {
 		b.sh.Stdout = wbc
@@ -158,7 +158,11 @@ func (b *Builder) publish(file string) (addr string, err error) {
 			return
 		}
 		lg.Debug("upload ok:", cdnAddr)
-		err = models.AddFile(b.pid, b.tag, cdnAddr, "output-")
+		output := ""
+		if b.wbc != nil {
+			output = string(b.wbc.Bytes())
+		}
+		err = models.AddFile(b.pid, b.tag, cdnAddr, output)
 		if err != nil {
 			lg.Error(err)
 		}
@@ -194,6 +198,12 @@ func (j *Builder) Auto() (addr string, err error) {
 		if er != nil {
 			lg.Warn(er)
 		}
+		// FIXME: delete WriteBroadcaster after finish
+		// if build error, output will not saved, it is not a good idea
+		// better to change models func to -..
+		//		SearchProject(project) AddProject(project)
+		//		SearchFile(pid, ref, os, arch)
+		//		AddFile(pid, ref, os, arch, sha)
 	}()
 	// download src (in order to get sha)
 	err = j.get()

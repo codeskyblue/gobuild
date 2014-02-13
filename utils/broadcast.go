@@ -52,6 +52,10 @@ func (wb *WriteBroadcaster) NewReader(name string) ([]byte, *io.PipeReader) {
 	return wb.buf.Bytes(), r
 }
 
+func (wb *WriteBroadcaster) Bytes() []byte {
+	return wb.buf.Bytes()
+}
+
 func (w *WriteBroadcaster) Write(p []byte) (n int, err error) {
 	w.Lock()
 	defer w.Unlock()
