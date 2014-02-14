@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"github.com/shxsun/go-sh"
-	"launchpad.net/goyaml"
+	"github.com/shxsun/goyaml"
 )
 import beeutils "github.com/astaxie/beego/utils"
 
