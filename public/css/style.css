@@ -144,20 +144,16 @@ a,.btn,.lbl{
 
 /* footer */
 #footer{
-    background: #444;
-    margin-top: 40px;
+    margin-top: 60px;
+    margin-bottom: 30px;
     padding: 24px 0;
     line-height: 50px;
-    color: #BBB;
+    color: #666;
 }
 
 #footer img{
     height: 50px;
     vertical-align: middle;
-}
-
-#footer a{
-    color: #a6e1ec;
 }
 
 #footer .thanks a{
@@ -168,9 +164,6 @@ a,.btn,.lbl{
 
 #project{
     margin-top: 20px;
-}
-
-#project h3{
     margin-bottom: 24px;
     padding-bottom: 24px;
     border-bottom: 1px dashed #BBB;
@@ -235,4 +228,37 @@ a,.btn,.lbl{
 #terminal .tip{
     padding-left: 0;
     margin-left: 0;
+}
+
+/* build */
+#build .project-header .status,#build .project-header .to-download{
+    margin-top: 12px;
+    margin-left: 24px;
+}
+
+#build .project-header .status{
+    color: #888;
+}
+
+#build .process-header{
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px dashed #BBB;
+}
+
+#build .process-header input{
+    margin-right: 18px;
+}
+
+#build .process-output{
+    margin-top: 24px;
+    background-color: #444;
+    color: #EEE;
+    padding: 12px 24px;
+    border-radius: 6px;
+    min-height: 360px;
+}
+
+#build .console{
+    font-family: Consolas, "Courier New", Arial,sans-serif;
 }
