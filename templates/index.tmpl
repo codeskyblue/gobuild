@@ -1,42 +1,49 @@
-<div class="row clearfix">
-	<div class="col-md-12 column">
-		<form id="form" role="form" method="get" action="#">
-			<div class="form-group">
-				<label for="name">git project address</label>
-				<input type="text" class="form-control col-md-8" id="address" placeholder="github.com/user/project" required autofocus/>
-			</div>
-			<button type="submit" class="btn btn-default">goto download page</button>
-		</form>
-	</div>
+<div id="hero">
+    <div class="container">
+        <h2>Compile Go Projects to <strong>Windows, Linux and MacOSX</strong></h2>
+        <h4>Integration with github, Support static assets</h4>
+    </div>
 </div>
-<hr/>
-<div class="row clearfix">
-	<div class="col-md-12 column">
-		<p> 
-			This website offers Google Go language(golang) online build and binary file share. 
-		</p>
-		<p>
-		But this website is still in progress, there must have a lot to learn and grow. If you feel something can be better, please tell us through <a href="https://github.com/shxsun/gobuild/issues">github issues</a>. We will try our best to make it better.
-		</p>
-		<p>
-		该项目还处于起步的阶段，肯定还有许多需要完善的。如果你感觉哪里需要改进的地方，直接<a href="https://github.com/shxsun/gobuild/issues">提交个issue</a>就可以啦。
-		<br/>
-		<strong>我们非常重视每一个反馈</strong>。只要我们能搞定的，我们都尽量搞定；搞不定的,我们也会想着法的搞定。
-		</p>
-	</div>
+<div id="container" class="clear grid">
+    <form id="go-form" class="container form grid-2-3">
+        <p class="item">
+            <input class="ipt" type="text" placeholder="github repository address, e.g. github.com/user/project" id="go-ipt"/>
+        </p>
+        <p class="item text-center">
+            <button class="class btn btn-blue go-btn icon-search">Search</button>
+            <button class="btn btn-red go-btn icon-download">Compile ~ Download</button>
+            <input type="hidden" name="f" value="www"/>
+        </p>
+    </form>
+    <div id="feature" class="container clear">
+        <div class="grid-1-4 case right feature">
+            <h5 class="title">Popular Cases</h5>
+            <ul>
+                <li><em class="lbl lbl-green">108</em><a href="/download/github.com/shxsun/gobuild">shxsun/gobuild</a></li>
+                <li><em class="lbl lbl-green">98</em><a href="/download/github.com/beego/bee">beego/bee</a></li>
+                <li><em class="lbl lbl-green">67</em><a href="/download/github.com/gpmgo/gopm">gpmgo/gopm</a></li>
+                <li><em class="lbl lbl-green">18</em><a href="/download/github.com/laher/goxc">laher/goxc</a></li>
+                <li><em class="lbl lbl-green">4</em><a href="/download/github.com/parkghost/gohttpbench">parkghost/gohttpbench</a></li>
+                <li>...</li>
+            </ul>
+        </div>
+        <div class="grid-2-3 doc left feature">
+            <h5 class="title">How to use</h5>
+            <pre><code>wget gobuild.io/github.com/user/project/master/linux/amd64 -O output.zip
+curl -L gobuild.io/github.com/user/project/master/linux/amd64 -O output.zip</code></pre>
+        </div>
+        <div class="grid-2-3 doc left warning">
+            <h5 class="title">Warning</h5>
+            <p>Not support <a href="#" class="lbl lbl-red"><strong>cgo</strong></a> and package
+                <a href="#" class="lbl lbl-red"><strong>os/user</strong></a>,
+                Read <a href="https://github.com/shxsun/gobuild#qaknownen-issues" target="_blank">details</a>.</p>
+        </div>
+    </div>
 </div>
-<div class="row clearfix">
-	<div class="col-md-12 column">
-		<h2>Cases</h2>
-		<ul>
-			<li><a href="./github.com/shxsun/gobuild">github.com/shxsun/gobuild (build the web itself)</a></li>
-			<li><a href="./github.com/beego/bee">github.com/beego/bee</a></li>
-			<li><a href="./github.com/gpmgo/gopm">github.com/gpmgo/gopm</a></li>
-			<li><a href="./github.com/laher/goxc">github.com/laher/goxc</a></li>
-			<li><a href="./github.com/parkghost/gohttpbench">github.com/parkghost/gohttpbench</a></li>
-			<li>...</li>
-		</ul>
-	</div>
-</div>
-<script src="./home.js"></script>
-
+<script>
+    $(function(){
+        $("#go-ipt").on('input',(function(){
+            $("#go-form").attr("action", "/download/"+$(this).val());
+        }));
+    });
+</script>

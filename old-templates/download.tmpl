@@ -1,0 +1,71 @@
+<div>
+	project: <a href="http://{{.Project}}">{{.Project}}</a>
+	<div>
+		<h3>Select <i>OS</i> and <i>Arch</i></h3>
+		<form role="form" class="form-horizontal" action="/dl">
+			<input type="hidden" name="p" value="{{.Project}}" />
+			<div class="form-group">
+				<label class="col-md-2">操作系统</label>
+				<div class="col-md-10">
+					<label><input type="radio" name="os" value="windows" checked /> windows</label>
+					<label><input type="radio" name="os" value="linux" /> linux</label>
+					<label><input type="radio" name="os" value="darwin" /> mac</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2">处理器</label>
+				<div class="col-md-10">
+					<label><input type="radio" name="arch" value="amd64" checked /> amd64</label>
+					<label><input type="radio" name="arch" value="386" /> 386</label>
+					<!--
+					<label><input type="radio" name="arch" value="arm" /> arm</label>
+					-->
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2">版本</label>
+				<div class="col-md-10">
+					<label><input type="radio" name="version" value="master" checked /> master</label>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<hr/>
+	<p>
+		<input type="input" id="wgetaddr" class="col-md-12" onclick="this.select()" value="" />
+	</p>
+	<p>
+		<input type="input" id="curladdr" class="col-md-12" onclick="this.select()" value="" />
+	</p>
+	<p>
+		<a id="clickaddr" class="btn btn-default" href="#"><span class="glyphicon glyphicon-arrow-down"></span> click to download</a>
+	</p>
+
+	<!--
+	<h4>使用脚本下载</h4>
+	<code>
+		curl -s http://{{.Server}}/dlscript/{{.Project}} | bash
+	</code>
+	-->
+	<script>
+	$(function(){
+		var $wget = $("#wgetaddr");
+		var $curl = $("#curladdr");
+		var $click = $("#clickaddr");
+		var autoAddr = function(){
+			os = $(":input[name=os]:checked").val();
+			arch = $(":input[name=arch]:checked").val();
+			var link = "http://{{.Hostname}}/{{.Project}}/master/"+os+"/"+arch;
+			$click.attr("href", link);
+			$wget.val("wget " + link + " -O output.zip");
+			$curl.val("curl -L " + link + " -o output.zip");
+		};
+		autoAddr();
+		$("form").change(autoAddr);
+	});
+	</script>
+	<p>compile need some time, please be patient | 下载需要时间，请耐心等待</p>
+	BTW: revel project achieve file ext is tar.gz
+</div>
+
