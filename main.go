@@ -200,7 +200,7 @@ func main() {
 	lg.Info("gobuild service stated ...")
 
 	http.Handle("/", m)
-	http.Handle("/websocket", websocket.Handler(WsBuildServer))
+	http.Handle("/websocket/", websocket.Handler(WsBuildServer))
 	http.HandleFunc("/hello", HelloServer)
 
 	if *secure {
