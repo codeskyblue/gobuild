@@ -7,17 +7,16 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/lunny/xorm"
 	"github.com/shxsun/klog"
-	//_ "github.com/mattn/go-sqlite3"
 )
 
 var (
-	//dbName = filepath.Join(utils.SelfDir(), "./sqlite.db")
 	x  *xorm.Engine
 	lg = klog.DevLog
 )
 
+// should be call before pacakge called
 func InitDB(driver, dataSource string) (err error) {
-	x, err = xorm.NewEngine(driver, dataSource) //"sqlite3", dbName)
+	x, err = xorm.NewEngine(driver, dataSource)
 	if err != nil {
 		return
 	}
@@ -81,16 +80,16 @@ func AddProject(name, ref, sha string) (id int64, err error) {
 	return sp.Id, nil
 }
 
-func SearchFile(projId int64, tag string) (f *File, err error) {
+func SearchFile(projID int64, tag string) (f *File, err error) {
 	f = new(File)
-	f.ProjId = projId
+	f.ProjId = projID
 	f.Tag = tag
 	ok, err := x.Get(f)
 	if err != nil {
 		return
 	}
 	if !ok {
-		err = fmt.Errorf("not found: (%d, %s)", projId, tag)
+		err = fmt.Errorf("not found: (%d, %s)", projID, tag)
 	}
 	return
 }

@@ -28,7 +28,7 @@ var (
 
 	lg = klog.DevLog
 
-	OS   = []string{"windows", "linux", "darwin"}
+	//OS   = []string{"windows", "linux", "darwin"}
 	Arch = []string{"386", "amd64"}
 )
 
