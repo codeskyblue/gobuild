@@ -1,0 +1,21 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		source :<i><b><span id="name"> {{.FullName}}</span></b></i>
+		
+		<a href="/download/{{.FullName}}">[Goto download page]</a>
+	</div>
+	<div class="panel-body">
+		<input type="input" name="goos" value="windows"/>
+		<input type="input" name="goarch" value="amd64"/>
+		<button class="btn btn-default">build</button>
+		<pre><span class="console" style="color:green"></span><span class="waiting">/</span></pre>
+	</div>
+</div>
+
+<script>
+	var wsUri ="ws://{{.WsServer}}"; // websocket address
+
+</script>
+<script src="/site.js"></script>
+
+

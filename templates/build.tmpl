@@ -1,21 +1,24 @@
-<div class="panel panel-default">
-	<div class="panel-heading">
-		source :<i><b><span id="name"> {{.FullName}}</span></b></i>
-		
-		<a href="/download/{{.FullName}}">[Goto download page]</a>
-	</div>
-	<div class="panel-body">
-		<input type="input" name="goos" value="windows"/>
-		<input type="input" name="goarch" value="amd64"/>
-		<button class="btn btn-default">build</button>
-		<pre><span class="console" style="color:green"></span><span class="waiting">/</span></pre>
-	</div>
+<div id="build">
+    <div id="project" class="container project-header clear">
+        <h3 class="left"><a class="github" href="/download/{{.FullName}}" target="_blank">{{.FullName}}</a></h3>
+        <span class="left status">building</span>
+        <a href="/download/{{.FullName}}" class="left lbl lbl-blue to-download">Download</a>
+    </div>
+    <div id="build-process" class="container">
+        <div class="process-header form">
+            <input type="text" name="goos" placeholder="windows" class="ipt"/>
+            <input type="text" name="goarch" placeholder="amd64" class="ipt"/>
+            <input class="btn btn-red" type="button" value="build"/>
+        </div>
+        <div class="process-output">
+            <pre class="console"></pre>
+            <span class="waiting">/</span>
+        </div>
+    </div>
 </div>
-
 <script>
 	var wsUri ="ws://{{.WsServer}}"; // websocket address
-
 </script>
-<script src="/site.js"></script>
+<script src="/js/build-websocket.js"></script>
 
 

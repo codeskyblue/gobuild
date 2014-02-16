@@ -1,71 +1,69 @@
-<div>
-	project: <a href="http://{{.Project}}">{{.Project}}</a>
-	<div>
-		<h3>Select <i>OS</i> and <i>Arch</i></h3>
-		<form role="form" class="form-horizontal" action="/dl">
-			<input type="hidden" name="p" value="{{.Project}}" />
-			<div class="form-group">
-				<label class="col-md-2">操作系统</label>
-				<div class="col-md-10">
-					<label><input type="radio" name="os" value="windows" checked /> windows</label>
-					<label><input type="radio" name="os" value="linux" /> linux</label>
-					<label><input type="radio" name="os" value="darwin" /> mac</label>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-md-2">处理器</label>
-				<div class="col-md-10">
-					<label><input type="radio" name="arch" value="amd64" checked /> amd64</label>
-					<label><input type="radio" name="arch" value="386" /> 386</label>
-					<!--
-					<label><input type="radio" name="arch" value="arm" /> arm</label>
-					-->
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-md-2">版本</label>
-				<div class="col-md-10">
-					<label><input type="radio" name="version" value="master" checked /> master</label>
-				</div>
-			</div>
-		</form>
-	</div>
-
-	<hr/>
-	<p>
-		<input type="input" id="wgetaddr" class="col-md-12" onclick="this.select()" value="" />
-	</p>
-	<p>
-		<input type="input" id="curladdr" class="col-md-12" onclick="this.select()" value="" />
-	</p>
-	<p>
-		<a id="clickaddr" class="btn btn-default" href="#"><span class="glyphicon glyphicon-arrow-down"></span> click to download</a>
-	</p>
-
-	<!--
-	<h4>使用脚本下载</h4>
-	<code>
-		curl -s http://{{.Server}}/dlscript/{{.Project}} | bash
-	</code>
-	-->
-	<script>
-	$(function(){
-		var $wget = $("#wgetaddr");
-		var $curl = $("#curladdr");
-		var $click = $("#clickaddr");
-		var autoAddr = function(){
-			os = $(":input[name=os]:checked").val();
-			arch = $(":input[name=arch]:checked").val();
-			var link = "http://{{.Hostname}}/{{.Project}}/master/"+os+"/"+arch;
-			$click.attr("href", link);
-			$wget.val("wget " + link + " -O output.zip");
-			$curl.val("curl -L " + link + " -o output.zip");
-		};
-		autoAddr();
-		$("form").change(autoAddr);
-	});
-	</script>
-	<p>compile need some time, please be patient | 下载需要时间，请耐心等待</p>
-	BTW: revel project achieve file ext is tar.gz
+<div id="download">
+    <div id="project" class="container">
+        <h3><a class="github" href="http://{{.Project}}" target="_blank" title="{{.Project}}">{{.Project}}</a></h3>
+    </div>
+    <form id="dl-form" class="form form-align container" action="/dl">
+        <input type="hidden" name="p" value="{{.Project}}" />
+        <div class="field os">
+            <label>OS</label>
+            <span class="windows radio">
+                <input type="radio" name="os" value="windows" class="chk" checked/><em>Windows</em>
+            </span>
+            <span class="linux radio">
+                <input type="radio" name="os" value="linux" class="chk"/><em>Linux</em>
+            </span>
+            <span class="darwin radio">
+                <input type="radio" name="os" value="darwin" class="chk"/><em>MacOSX</em>
+            </span>
+        </div>
+        <p class="field bit-size">
+            <label>Bit Size</label>
+            <span class="radio">
+                <input type="radio" name="arch" value="amd64" class="chk" checked/><em>amd64</em>
+            </span>
+            <span class="radio">
+                <input type="radio" name="arch" value="386" class="chk"/><em>i386</em>
+            </span>
+        </p>
+        <p class="field branch">
+            <label>Branch</label>
+            <span class="radio">
+                <input type="radio" name="version" value="master" class="chk" checked/><em>master</em>
+            </span>
+        </p>
+        <p>
+            <label>&nbsp;</label>
+            <button class="btn-red btn icon-download">Compile ~ Download</button>
+        </p>
+    </form>
+    <div id="terminal" class="container form">
+        <h4>Use Terminal</h4>
+        <p class="field">
+            <input id="wget-addr" type="text" name="wget-addr" class="ipt" readonly/>
+        </p>
+        <p class="field">
+            <input id="curl-addr" type="text" name="curl-addr" class="ipt" readonly/>
+        </p>
+        <p class="tip">Binary file and static assets are compressed into zip file. Read <a href="https://github.com/shxsun/gobuild#gobuild-optional" target="_blank">details</a>.</p>
+    </div>
 </div>
-
+<script>
+    $(function () {
+        var $wget = $("#wget-addr");
+        var $curl = $("#curl-addr");
+        var $form = $("#dl-form");
+        var autoAddr = function () {
+            var os = $(":input[name=os]:checked").val(),
+                    arch = $(":input[name=arch]:checked").val(),
+                    link = "http://{{.Hostname}}/{{.Project}}/master/" + os + "/" + arch;
+            $form.attr("action", link);
+            $wget.val("wget " + link + " -O output.zip");
+            $curl.val("curl -L " + link + " -o output.zip");
+        };
+        autoAddr();
+        $form.change(autoAddr).on("submit",function(){
+            window.location = $form.attr("action");
+            return false;
+        });
+    });
+</script>
