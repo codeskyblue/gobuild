@@ -1,0 +1,25 @@
+upstream gobuild {
+        server 127.0.0.1:3000;
+}
+server {
+        server_name gobuild.io build.golangtc.com build.gopm.io;
+
+        if ($host != "gobuild.io"){
+                rewrite ^/(.*)$ http://gobuild.io/$1 permanent;
+        }
+        #listen 80;
+        listen 443;
+        ssl on;
+        ssl_certificate /var/go/gobuild/bin/ssl.crt;
+        ssl_certificate_key /var/go/gobuild/bin/ssl.key;
+
+        location / {
+                proxy_pass_header Server;
+                proxy_set_header Host $http_host;
+                proxy_redirect off;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Scheme $scheme;
+                proxy_set_header X-Forwarded-Proto https;
+                proxy_pass http://gobuild;
+        }
+}
