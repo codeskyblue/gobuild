@@ -15,7 +15,7 @@ import (
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/qiniu/api/conf"
 	"github.com/shxsun/go-websocket"
-	"github.com/shxsun/gobuild/models"
+	"github.com/shxsun/gobuild/database"
 	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/goyaml"
 	"github.com/shxsun/klog"
@@ -193,7 +193,7 @@ func HelloServer(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 	var err error
-	err = models.InitDB(opts.Driver, opts.DataSource)
+	err = database.InitDB(opts.Driver, opts.DataSource)
 	if err != nil {
 		lg.Fatal(err)
 	}

@@ -12,7 +12,7 @@ import (
 	beeutils "github.com/astaxie/beego/utils"
 	"github.com/shxsun/go-sh"
 	"github.com/shxsun/go-uuid"
-	"github.com/shxsun/gobuild/models"
+	"github.com/shxsun/gobuild/database"
 	"github.com/shxsun/gobuild/utils"
 )
 
@@ -162,7 +162,7 @@ func (b *Builder) publish(file string) (addr string, err error) {
 		if b.wbc != nil {
 			output = string(b.wbc.Bytes())
 		}
-		err = models.AddFile(b.pid, b.tag, cdnAddr, output)
+		err = database.AddFile(b.pid, b.tag, cdnAddr, output)
 		if err != nil {
 			lg.Error(err)
 		}
@@ -200,7 +200,7 @@ func (j *Builder) Auto() (addr string, err error) {
 		}
 		// FIXME: delete WriteBroadcaster after finish
 		// if build error, output will not saved, it is not a good idea
-		// better to change models func to -..
+		// better to change database func to -..
 		//		SearchProject(project) AddProject(project)
 		//		SearchFile(pid, ref, os, arch)
 		//		AddFile(pid, ref, os, arch, sha)
@@ -211,9 +211,9 @@ func (j *Builder) Auto() (addr string, err error) {
 		return
 	}
 	// search db for history project record
-	p, err := models.SearchProject(j.project, j.sha)
+	p, err := database.SearchProject(j.project, j.sha)
 	if err != nil {
-		pid, er := models.AddProject(j.project, j.ref, j.sha)
+		pid, er := database.AddProject(j.project, j.ref, j.sha)
 		if er != nil {
 			err = er
 			return
@@ -231,7 +231,7 @@ func (j *Builder) Auto() (addr string, err error) {
 		return hisAddr, nil
 	}
 	// search database history
-	f, err := models.SearchFile(j.pid, j.tag)
+	f, err := database.SearchFile(j.pid, j.tag)
 	lg.Debugf("search db: %v", f)
 	if err == nil {
 		addr = f.Addr
