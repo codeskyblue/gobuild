@@ -118,7 +118,7 @@ func (j *Builder) build(os, arch string) (file string, err error) {
 func (b *Builder) publish(file string) (addr string, err error) {
 	var path string
 	if b.framework == "" {
-		path, err = b.pack([]string{file}, filepath.Join(b.srcDir, ".gobuild"))
+		path, err = b.pack([]string{file}, filepath.Join(b.srcDir, ".gobuild.yml"))
 	} else {
 		path, err = utils.TempFile("files", "tmp-", "-"+filepath.Base(file))
 		if err != nil {

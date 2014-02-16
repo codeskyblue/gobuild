@@ -11,39 +11,38 @@ But few website offers golang binary shares. So I created one.
 ### How to use
 	wget gobuild.io/github.com/shxsun/fswatch/v1.0/linux/amd64 -O fswatch.zip
 
-### .gobuild (optional)
-use `.gobuild` file, you can use more function with gobuild.io.
+### .gobuild.yml (optional)
+use `.gobuild.yml` file, you can use more function with <https://gobuild.io>.
 
-first you need to add a file `.gobuild` into project root.
+first you need to add a file `.gobuild.yml` into project root.
 
-`.gobuild` is just a yaml file. specified with which file should be included and excluded.
+For beego project: (platform will will invode `bee pack -f zip`)
 
-for example. If I want to add static and LICENSE and exclude README.md. `.gobuild` can be write with
+	framework: beego
+	
+For revel project: (`revel package`)
+
+	framework: revel
+
+For self define which file should be packaged.(excludes is not working now).
+Binary file is defaulted added, you don't need to worry about it.
 
 	filesets:
 		includes:
 			- static
 			- LICENSE
-		excludes:
 			- README.md
+		excludes:
+			- CHANGELOG
 
-binary file is defaulted added, you don't need to worry about it.
-
-if no `.gobuild` file found in your project. A default `.gobuild` file will be used.
-
-*for beego and revel project* `.gobuild` file should like this.
-
-	framework: beego
-	# or framework: revel
-
-beego will use `bee pack`, and revel use `revel pack`(revel unfinished)
-
-see [default gobuildrc](public/gobuildrc)
+There is a default for every project: see [default gobuildrc](public/gobuildrc)
 
 ### add badge
+[![Gobuild Download](http://gobuild.io/badge/github.com/shxsun/gobuild/download.png)](http://gobuild.io/github.com/shxsun/gobuild)
+
 assume you project address is github.com/shxsun/gobuild
 
-and your png address: <https://gobuild.io/badge/github.com/shxsun/gobuild/download.png>
+and the png address is: <https://gobuild.io/badge/github.com/shxsun/gobuild/download.png>
 
 Markdown link is link below
 
