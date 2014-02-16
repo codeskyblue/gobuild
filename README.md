@@ -11,7 +11,7 @@ But few website offers golang binary shares. So I created one.
 ### How to use
 	wget gobuild.io/github.com/shxsun/fswatch/v1.0/linux/amd64 -O fswatch.zip
 
-### .gobuild.yml (optional)
+### .gobuild.yml
 use `.gobuild.yml` file, you can use more function with <https://gobuild.io>.
 
 first you need to add a file `.gobuild.yml` into project root.
@@ -25,7 +25,7 @@ For revel project: (`revel package`)
 	framework: revel
 
 For self define which file should be packaged.(excludes is not working now).
-Binary file is defaulted added, you don't need to worry about it.
+And binary file is defaulted added, you don't need to worry about it.
 
 	filesets:
 		includes:
@@ -42,7 +42,7 @@ There is a default for every project: see [default gobuildrc](public/gobuildrc)
 
 assume you project address is github.com/shxsun/gobuild
 
-and the png address is: <https://gobuild.io/badge/github.com/shxsun/gobuild/download.png>
+and the png address is: <http://gobuild.io/badge/github.com/shxsun/gobuild/download.png>
 
 Markdown link is link below
 
