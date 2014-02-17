@@ -86,6 +86,7 @@ func (j *Builder) build(os, arch string) (file string, err error) {
 	fmt.Println(j.sh.Env)
 	j.sh.Env["GOOS"] = os
 	j.sh.Env["GOARCH"] = arch
+	j.sh.Set(sh.Dir(j.srcDir))
 
 	// switch framework
 	j.framework = j.rc.Framework
@@ -100,6 +101,10 @@ func (j *Builder) build(os, arch string) (file string, err error) {
 		return
 	default:
 		j.framework = ""
+	}
+
+	if j.sh.Test("f", ".gopmfile") {
+		j.sh.Alias("go", "gopm")
 	}
 
 	err = j.sh.Call("go", []string{"get", "-u", "-v", "."})

@@ -9,6 +9,7 @@ go get -v github.com/mitchellh/gox
 
 go get -v github.com/beego/bee
 go get -v github.com/robfig/revel/revel
+go get -v github.com/gpmgo/gopm
 
 echo build toolchain
 gox -build-toolchain

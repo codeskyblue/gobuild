@@ -37,6 +37,10 @@ And binary file is defaulted added, you don't need to worry about it.
 
 There is a default for every project: see [default gobuildrc](public/gobuildrc)
 
+### other build tool support
+support [gopm](http://gopm.io).
+
+Test is `.gopmfile` exists in project root, then use alias go=gopm instead.
 ### add badge
 [![Gobuild Download](http://gobuild.io/badge/github.com/shxsun/gobuild/download.png)](http://gobuild.io/github.com/shxsun/gobuild)
 
