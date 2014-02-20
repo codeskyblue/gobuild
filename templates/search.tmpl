@@ -1,1 +1,15 @@
-search page
+<div id="search-result" class="container">{{if lt .PackagesLength 1}}
+    <h3>Sorry, no package found about "{{.Keyword}}"</h3>{{else}}
+    <h3>We've found {{.PackagesLength}} packages about "{{.Keyword}}"</h3>{{end}}{{if .Error}}
+    <p class="error">Search API Error: {{.Error}}</p>{{end}}
+    <ul id="search-result-list">
+        {{range .Packages}}
+            <li>
+                <span class="lbl lbl-blue name">{{.Name}}</span>
+                <a class="icon-download link" href="/download/{{.ImportPath}}">{{.ImportPath}}</a>
+                <a class="icon-search visit" href="https://{{.Path}}" target="_blank">visit</a>
+            </li>
+        {{end}}
+    </ul>
+    <p class="thanks">Thanks <a href="http://gowalker.org">GoWalker Search API</a> support.</p>
+</div>

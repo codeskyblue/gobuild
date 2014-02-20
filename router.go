@@ -52,8 +52,14 @@ func InitRouter() {
 			"WsServer": opts.Hostname + "/websocket",
 		})
 	})
-	m.Get("/search", func(params martini.Params, r render.Render) {
-		r.HTML(200, "search", map[string]interface{}{})
+	m.Get("/search/:keyword", func(params martini.Params, r render.Render) {
+		packages, err := NewSearch(params["keyword"])
+		r.HTML(200, "search", map[string]interface{}{
+			"Keyword":        params["keyword"],
+			"Packages":       packages.Packages,
+			"PackagesLength": len(packages.Packages),
+			"Error":          err,
+		})
 	})
 
 	initBadge()
