@@ -8,11 +8,11 @@
     <form id="go-form" class="container form grid-2-3">
         <p class="item">
             <input class="ipt" type="text" placeholder="github repository address, e.g. github.com/user/project" id="go-ipt"/>
+            <span class="tip" id="go-ipt-tip"></span>
         </p>
         <p class="item text-center">
-            <button class="class btn btn-blue go-btn icon-search">Search</button>
-            <button class="btn btn-red go-btn icon-download">Compile ~ Download</button>
-            <input type="hidden" name="f" value="www"/>
+            <button class="class btn btn-blue go-btn icon-search" type="button" id="go-search">Search</button>
+            <button class="btn btn-red go-btn icon-download" type="button" id="go-download">Compile ~ Download</button>
         </p>
     </form>
     <div id="feature" class="container clear">
@@ -40,10 +40,9 @@ curl -L gobuild.io/github.com/user/project/master/linux/amd64 -O output.zip</cod
         </div>
     </div>
 </div>
+<script src="/js/site.js"></script>
 <script>
     $(function(){
-        $("#go-ipt").on('input',(function(){
-            $("#go-form").attr("action", "/download/"+$(this).val());
-        }));
+        initHomeEvent();
     });
 </script>

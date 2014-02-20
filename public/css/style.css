@@ -97,6 +97,11 @@ a,.btn,.lbl{
     margin-left: -12px;
 }
 
+#go-ipt-tip{
+    color: #d14511;
+    display: none;
+}
+
 #go-ipt:hover{
     box-shadow: 0 0 4px #2aabd2;
 }
