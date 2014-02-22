@@ -52,9 +52,15 @@
         var $wget = $("#wget-addr");
         var $curl = $("#curl-addr");
         var $form = $("#dl-form");
+		var $os = $(":input[name=os]"), $arch = $(":input[name=arch]");
+
+		var x = getosarch();
+		$os.filter("[value="+x.os+"]").attr("checked", true);
+		$arch.filter("[value="+x.arch+"]").attr("checked", true);
+
         var autoAddr = function () {
-            var os = $(":input[name=os]:checked").val(),
-                    arch = $(":input[name=arch]:checked").val(),
+            var os = $os.filter(":checked").val(),
+                    arch = $arch.filter(":checked").val(),
                     link = "http://{{.Hostname}}/{{.Project}}/master/" + os + "/" + arch;
             $form.attr("action", link);
             $wget.val("wget " + link + " -O output.zip");

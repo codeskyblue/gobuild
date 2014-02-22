@@ -25,7 +25,7 @@ var (
 func initBadge() {
 	m.Get("/badge/:web/:name/:p/download.png", func(w http.ResponseWriter, r *http.Request) {
 		var err error
-		img := image.NewNRGBA(image.Rect(0, 0, 180, 18))
+		img := image.NewNRGBA(image.Rect(0, 0, 140, 18))
 		fontBytes, err := ioutil.ReadFile(fontFile)
 		if err != nil {
 			return
@@ -35,7 +35,7 @@ func initBadge() {
 			return
 		}
 		left, right := img.Bounds(), img.Bounds()
-		const middle = 65
+		const middle = 60
 		left.Max = image.Pt(middle, 18)
 		right.Min = image.Pt(middle, 0)
 		// fill left(black) right(green)
@@ -50,13 +50,13 @@ func initBadge() {
 		c.SetClip(img.Bounds())
 		c.SetDst(img)
 		c.SetSrc(image.White)
-		pt := freetype.Pt(5, 12)
+		pt := freetype.Pt(7, 12)
 		_, err = c.DrawString("gobuild.io", pt) // 10 chars width = 60px
 		if err != nil {
 			return
 		}
 		c.SetSrc(image.Black)
-		pt = freetype.Pt(middle+20, 12)
+		pt = freetype.Pt(middle+18, 12)
 		_, err = c.DrawString("download", pt)
 
 		w.Header().Set("Content-Type", "image/png")

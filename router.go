@@ -1,7 +1,9 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -57,6 +59,20 @@ func InitRouter() {
 		url := r.FormValue("url")
 		lg.Info(url)
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	})
+	// about && document
+	m.Get("/about", func(r render.Render) {
+		r.HTML(200, "about", nil)
+	})
+	m.Get("/document", func(r render.Render) {
+		path := filepath.Join(filepath.Dir(os.Args[0]), "README.md")
+		readme, err := ioutil.ReadFile(path)
+		if err != nil {
+			lg.Error(err)
+		}
+		data := make(map[string]interface{}, 0)
+		data["Readme"] = string(readme)
+		r.HTML(200, "document", data)
 	})
 
 	initBadge()

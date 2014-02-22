@@ -13,16 +13,12 @@ func (b *Builder) get() (err error) {
 	exists := beeutils.FileExists(b.srcDir)
 	b.sh.Call("date")
 	if !exists {
-		b.sh.Call("echo", []string{"downloading src"})
 		err = b.sh.Call("go", []string{"get", "-v", "-d", b.project})
 		if err != nil {
 			return
 		}
 	}
-	err = b.sh.Call("echo", []string{"fetch", b.ref}, sh.Dir(b.srcDir))
-	if err != nil {
-		return
-	}
+	b.sh.Set(sh.Dir(b.srcDir))
 	if b.ref == "-" {
 		b.ref = "master"
 	}

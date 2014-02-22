@@ -48,6 +48,7 @@ func NewBuilder(project, ref string, goos, arch string, wbc *utils.WriteBroadcas
 		arch:     arch,
 		fullname: strings.Join([]string{project, ref, goos, arch}, "-"),
 	}
+	b.sh.ShowCMD = true
 	if wbc != nil {
 		b.sh.Stdout = wbc
 		b.sh.Stderr = wbc
@@ -83,7 +84,6 @@ func (b *Builder) init() (err error) {
 
 // build src
 func (j *Builder) build(os, arch string) (file string, err error) {
-	fmt.Println(j.sh.Env)
 	j.sh.Env["GOOS"] = os
 	j.sh.Env["GOARCH"] = arch
 	j.sh.Set(sh.Dir(j.srcDir))
@@ -244,7 +244,7 @@ func (j *Builder) Auto() (addr string, err error) {
 	}
 
 	// build xc
-	j.sh.Call("echo", "building")
+	//j.sh.Call("echo", "building")
 	file, err := j.build(j.os, j.arch)
 	if err != nil {
 		return
