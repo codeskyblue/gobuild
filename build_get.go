@@ -11,6 +11,7 @@ import beeutils "github.com/astaxie/beego/utils"
 // download src
 func (b *Builder) get() (err error) {
 	exists := beeutils.FileExists(b.srcDir)
+	b.sh.Call("date")
 	if !exists {
 		b.sh.Call("echo", []string{"downloading src"})
 		err = b.sh.Call("go", []string{"get", "-v", "-d", b.project})

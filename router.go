@@ -52,6 +52,12 @@ func InitRouter() {
 			"WsServer": opts.Hostname + "/websocket",
 		})
 	})
+	// all out links call redirect
+	m.Get("/redirect", func(w http.ResponseWriter, r *http.Request) {
+		url := r.FormValue("url")
+		lg.Info(url)
+		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	})
 
 	initBadge()
 

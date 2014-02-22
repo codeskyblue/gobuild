@@ -68,16 +68,11 @@ $(function () {
         $console.html($console.html() + line);
     }
 
-    // progress bar
-    var pgId = setInterval(function () {
-        $waiting.html(pgChars[pgIndex]);
-        pgIndex = (pgIndex + 1) % 4;
-    }, 200);
 
     var start_build = function () {
-        var $project = "github.com/shxsun/fswatch",
+        var $project = $(":input[name=project]").val(),
             $branch = "master",
-            $goos = "linux",
+            $goos = "windows", // FIXME: read from html
             $goarch = "amd64",
             initMessage = {
                 project: $project,
@@ -87,17 +82,21 @@ $(function () {
             };
         var ws = new WebSocket(wsUri);
         var message = JSON.stringify(initMessage);
-        ws.onerror = function (e) {
-            alert("websocket connect error");
-        };
+		var pgId = 0;
+        ws.onerror = function (e) { alert("websocket connect error"); };
         ws.onopen = function (e) {
             ws.send(message);
+			// progress bar
+			pgId = setInterval(function () {
+				$waiting.html(pgChars[pgIndex]);
+				pgIndex = (pgIndex + 1) % 4;
+			}, 200);
         };
         ws.onmessage = function (e) {
             var json = JSON.parse(e.data);
             console.log(e.data);
             writeConsole(formatLine(json.data));
-            //writeConsole(json.data);
+            //writeConsole(json.data); // leave it for debug
 			window.scrollTo(0, document.body.scrollHeight)
             return true;
         };
@@ -107,5 +106,8 @@ $(function () {
             $waiting.html("--DONE--").css("color", "#a6e1ec");
         }
     };
-    start_build(); // make a call
+	$(".start-build").click(function(){
+		$console.html("");
+		start_build(); // make a call
+	});
 });

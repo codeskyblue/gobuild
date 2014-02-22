@@ -1,18 +1,19 @@
 <div id="build">
     <div id="project" class="container project-header clear">
         <h3 class="left"><a class="github" href="/download/{{.FullName}}" target="_blank">{{.FullName}}</a></h3>
-        <span class="left status">building</span>
-        <a href="/download/{{.FullName}}" class="left lbl lbl-blue to-download">Download</a>
+        <span class="left status">last build: unknown</span>
+        <a href="/download/{{.FullName}}" class="left lbl lbl-blue to-download">Download</a> 
     </div>
     <div id="build-process" class="container">
         <div class="process-header form">
+			<input type="hidden" value="{{.FullName}}" name="project" />
             <input type="text" name="goos" placeholder="windows" class="ipt"/>
             <input type="text" name="goarch" placeholder="amd64" class="ipt"/>
-            <input class="btn btn-red" type="button" value="build"/>
+            <input class="start-build btn btn-red" type="button" value="build"/>
         </div>
         <div class="process-output">
             <pre class="console"></pre>
-            <span class="waiting">/</span>
+            <span class="waiting">click <strong class="start-build">build</strong> to start building.</span>
         </div>
     </div>
 </div>

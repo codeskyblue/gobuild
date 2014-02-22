@@ -19,11 +19,11 @@
         <div class="grid-1-4 case right feature">
             <h5 class="title">Popular Cases</h5>
             <ul>
-                <li><em class="lbl lbl-green">108</em><a href="/download/github.com/shxsun/gobuild">shxsun/gobuild</a></li>
-                <li><em class="lbl lbl-green">98</em><a href="/download/github.com/beego/bee">beego/bee</a></li>
-                <li><em class="lbl lbl-green">67</em><a href="/download/github.com/gpmgo/gopm">gpmgo/gopm</a></li>
-                <li><em class="lbl lbl-green">18</em><a href="/download/github.com/laher/goxc">laher/goxc</a></li>
-                <li><em class="lbl lbl-green">4</em><a href="/download/github.com/parkghost/gohttpbench">parkghost/gohttpbench</a></li>
+                <li><em class="lbl lbl-green">108</em><a href="/build/github.com/shxsun/gobuild">shxsun/gobuild</a></li>
+                <li><em class="lbl lbl-green">98</em><a href="/build/github.com/beego/bee">beego/bee</a></li>
+                <li><em class="lbl lbl-green">67</em><a href="/build/github.com/gpmgo/gopm">gpmgo/gopm</a></li>
+                <li><em class="lbl lbl-green">18</em><a href="/build/github.com/laher/goxc">laher/goxc</a></li>
+                <li><em class="lbl lbl-green">4</em><a href="/build/github.com/parkghost/gohttpbench">parkghost/gohttpbench</a></li>
                 <li>...</li>
             </ul>
         </div>
@@ -43,7 +43,7 @@ curl -L gobuild.io/github.com/user/project/master/linux/amd64 -O output.zip</cod
 <script>
     $(function(){
         $("#go-ipt").on('input',(function(){
-            $("#go-form").attr("action", "/download/"+$(this).val());
+            $("#go-form").attr("action", "/build/"+$(this).val());
         }));
     });
 </script>

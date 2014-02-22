@@ -63,6 +63,10 @@ func NewStreamOutput(project, branch, goos, goarch string) *StreamOutput {
 			if err != nil {
 				lg.Error(err)
 			}
+			mu.Lock()
+			defer mu.Unlock()
+			delete(broadcasts, fullname)
+			lg.Info("delete broadcasts", project, broadcasts)
 		}()
 	}
 

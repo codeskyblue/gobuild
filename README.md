@@ -11,6 +11,9 @@ But few website offers golang binary shares. So I created one.
 ### How to use
 	wget gobuild.io/github.com/shxsun/fswatch/v1.0/linux/amd64 -O fswatch.zip
 
+-- unfinished --
+	wget gobuild.io/linux/amd64/v1.0/github.com/shxsun/fswatch/fswatch.zip
+
 ### .gobuild.yml
 use `.gobuild.yml` file, you can use more function with <https://gobuild.io>.
 

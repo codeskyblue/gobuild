@@ -63,5 +63,15 @@
     ga('create', 'UA-46959729-1', 'gobuild.io');
     ga('send', 'pageview');
 </script>
+<script>
+	/* all outside links change to /redirect?url= */
+	$("a").click(function(){
+		var href = $(this).attr("href");
+		if (/^http[s]?:/.test(href)) {
+			var newUrl = "/redirect?url="+encodeURIComponent(href);
+			$(this).attr("href", newUrl);
+		}
+	});
+</script>
 </body>
 </html>
