@@ -264,6 +264,11 @@ a, .btn, .lbl {
 
 #build .console {
     font-family: Consolas, "Courier New", Arial, sans-serif;
+    word-wrap: break-word;
+}
+
+#build .badge{
+    vertical-align: middle;
 }
 
 /* #search-result */
@@ -289,4 +294,11 @@ a, .btn, .lbl {
 
 #search-result-list .visit, #search-result .thanks, #search-result .thanks a {
     color: #888;
+}
+
+/** #about and #doc **/
+
+#about,#doc{
+    margin-top: 24px;
+    margin-bottom: 40px;
 }

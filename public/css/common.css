@@ -510,6 +510,11 @@ a.lbl-green:hover {
     display: block
 }
 
+.markdown a img{
+    max-width: none;
+    display: inline;
+}
+
 .markdown table {
     margin: 12px 0;
     width: 98%

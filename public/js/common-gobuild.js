@@ -7,3 +7,23 @@ var getosarch = function(){
 	var goarch = mapArch[goos];
 	return {os: goos, arch: goarch};
 }
+
+function renderMarkdown() {
+    var $md = $('.markdown');
+    $md.each(function (i, item) {
+        $(item).html(marked($(item).html().replace(/&gt;/g, '>')));
+    });
+    var code = $md.find('pre code');
+    if (code.length) {
+        $("<link>").attr({ rel: "stylesheet", type: "text/css", href: "/css/highlight.css"}).appendTo("head");
+        $.getScript("/js/highlight.min.js", function () {
+            code.each(function (i, item) {
+                hljs.highlightBlock(item)
+            });
+        });
+    }
+}
+
+$(function(){
+    renderMarkdown();
+});

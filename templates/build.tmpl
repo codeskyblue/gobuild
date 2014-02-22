@@ -2,31 +2,31 @@
     <div id="project" class="container project-header clear">
         <h3 class="left"><a class="github" href="/download/{{.FullName}}" target="_blank">{{.FullName}}</a></h3>
         <span class="left status">last build: unknown</span>
-        <a href="/download/{{.FullName}}" class="left lbl lbl-blue to-download">Download</a> 
+        <a href="/download/{{.FullName}}" class="left lbl lbl-blue to-download">Download</a>
     </div>
-	<div class="container">
-		Badge Markdown: <img alt="badge" src="/badge/{{.FullName}}/download.png"/>
-		<pre>[![Gobuild Download](http://gobuild.io/badge/{{.FullName}}/download.png)](http://gobuild.io/{{.FullName}})</pre>
-	</div>
-    <div id="build-process" class="container">
-        <div class="process-header form">
-			<input type="hidden" value="{{.FullName}}" name="project" />
-            <input type="text" name="goos" placeholder="platform" class="ipt"/>
-            <input type="text" name="goarch" placeholder="arch" class="ipt"/>
-            <input class="start-build btn btn-red" type="button" value="build"/>
-        </div>
-        <div class="process-output">
-            <pre class="console"></pre>
-            <span class="waiting">click <strong class="start-build">build</strong> to start building.</span>
+    <div class="container">
+        <h4>Badge Markdown:&nbsp;&nbsp;&nbsp;&nbsp;<img alt="badge" src="/badge/{{.FullName}}/download.png" class="badge"/></h4>
+        <div class="markdown">```
+[![Gobuild Download](http://gobuild.io/badge/{{.FullName}}/download.png)](http://gobuild.io/{{.FullName}})
+```</div>
+        <div id="build-process" class="container">
+            <div class="process-header form">
+                <input type="hidden" value="{{.FullName}}" name="project"/>
+                <input type="text" name="goos" placeholder="platform" class="ipt"/>
+                <input type="text" name="goarch" placeholder="arch" class="ipt"/>
+                <input class="start-build btn btn-red" type="button" value="build"/>
+            </div>
+            <div class="process-output">
+                <pre class="console"></pre>
+                <span class="waiting">click <strong class="start-build">build</strong> to start building.</span>
+            </div>
         </div>
     </div>
 </div>
 <script>
 	var wsUri ="ws://{{.WsServer}}/output"; // websocket address
+    var x = getosarch();
+    $(":input[name=goos]").val(x.os);
+    $(":input[name=goarch]").val(x.arch);
 </script>
 <script src="/js/build-websocket.js"></script>
-<script>
-	var x = getosarch();
-	$(":input[name=goos]").val(x.os);
-	$(":input[name=goarch]").val(x.arch);
-</script>
