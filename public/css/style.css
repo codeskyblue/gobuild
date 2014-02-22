@@ -1,95 +1,94 @@
 /*global css3*/
-
 @import url(http://fonts.googleapis.com/css?family=Ubuntu:400,700);
 
-a,.btn,.lbl{
-    -webkit-transition:all linear .25s;
+a, .btn, .lbl {
+    -webkit-transition: all linear .25s;
 }
 
-.ipt{
-    -webkit-transition:all linear .25s;
+.ipt {
+    -webkit-transition: all linear .25s;
 }
 
 /* header style */
-#header{
+#header {
     height: 60px;
     background: #282828;
     line-height: 60px;
 }
 
-#header .logo{
+#header .logo {
     font-size: 28px;
     color: #DDD;
 }
 
-#header .logo:hover{
+#header .logo:hover {
     color: #FAFAFA;
 }
 
-#nav{
+#nav {
     margin-left: 30px;
 }
 
-#nav li{
+#nav li {
     float: left;
 }
 
-#nav li a{
+#nav li a {
     display: block;
     color: #F0F0F0;
     padding: 0 25px;
     font-size: 15px;
 }
 
-#nav li a:hover{
+#nav li a:hover {
     background: #181818;
     text-shadow: 0 0 4px #0079bc;
     color: #2aabd2;
 }
 
-#header .git-btn{
+#header .git-btn {
     line-height: 40px;
     margin-top: 14px;
 }
 
-#sign-in{
+#sign-in {
     margin-top: 14px;
     padding: 4px 25px !important;
 }
 
-#sign-in:hover{
+#sign-in:hover {
     background-color: #005b9b !important;
     color: white !important;
 }
 
 /* hero container */
-#hero{
+#hero {
     background: #EEE;
 }
 
-#hero .container{
-    padding: 40px 0 ;
+#hero .container {
+    padding: 40px 0;
     background: url("../img/gopher.png") right 20px no-repeat;
 }
 
-#hero h4{
+#hero h4 {
     color: #888;
 }
 
-#hero strong{
+#hero strong {
     color: #0079bc;
 }
 
 /* search and compile form */
-#go-form{
+#go-form {
     margin: 80px auto;
 }
 
-#go-form .item{
+#go-form .item {
     margin-bottom: 40px;
 }
 
-#go-ipt{
+#go-ipt {
     width: 100%;
     height: 40px;
     font-size: 21px;
@@ -97,11 +96,16 @@ a,.btn,.lbl{
     margin-left: -12px;
 }
 
-#go-ipt:hover{
+#go-ipt-tip {
+    color: #d14511;
+    display: none;
+}
+
+#go-ipt:hover {
     box-shadow: 0 0 4px #2aabd2;
 }
 
-.go-btn{
+.go-btn {
     font-size: 18px;
     height: 50px;
     padding: 0 2em;
@@ -109,41 +113,40 @@ a,.btn,.lbl{
 }
 
 /* features */
-#feature .doc pre{
+#feature .doc pre {
     background: #FFF;
     padding: 6px 12px;
 }
 
-#feature .doc code{
+#feature .doc code {
     font-size: 16px;
     background: #FFF;
     font-family: Consolas, "Courier New", Arial;
 }
 
-#feature .case ul{
+#feature .case ul {
     margin-top: 0;
     margin-left: 0;
 }
 
-#feature .case em.lbl{
+#feature .case em.lbl {
     padding: 4px 6px;
     margin-right: 12px;
     font-family: Verdana, Tahoma, '微软雅黑', '宋体', sans-serif;
     font-size: 12px;
 }
 
-#feature .title{
+#feature .title {
     font-weight: bold;
 }
 
-#feature .warning .lbl{
+#feature .warning .lbl {
     padding: 2px 4px 6px;
-    margin:0 6px;
+    margin: 0 6px;
 }
 
-
 /* footer */
-#footer{
+#footer {
     margin-top: 60px;
     margin-bottom: 30px;
     padding: 24px 0;
@@ -151,69 +154,69 @@ a,.btn,.lbl{
     color: #666;
 }
 
-#footer img{
+#footer img {
     height: 50px;
     vertical-align: middle;
 }
 
-#footer .thanks a{
+#footer .thanks a {
     margin-right: .8em;
 }
 
 /* download */
 
-#project{
+#project {
     margin-top: 20px;
     margin-bottom: 24px;
     padding-bottom: 24px;
     border-bottom: 1px dashed #BBB;
 }
 
-#project h3 a{
+#project h3 a {
     padding: 6px 0 6px 45px;
 }
 
-#project h3 a.github{
+#project h3 a.github {
     background: url("../img/github.png") left center no-repeat;
 }
 
 /* dl-form */
 
-#dl-form label{
+#dl-form label {
     font-size: 18px;
     margin-right: 44px;
     font-weight: bold;
     width: 80px;
 }
 
-#dl-form .field{
+#dl-form .field {
     margin-bottom: 32px;
 }
 
-#dl-form .radio{
+#dl-form .radio {
     display: inline-block;
     font-weight: bold;
     font-size: 18px;
     padding-right: 22px;
 }
 
-#dl-form .os .radio{
+#dl-form .os .radio {
     padding-left: 44px;
 }
 
-#dl-form .windows{
+#dl-form .windows {
     background: url("../img/win.png") left center no-repeat;
 }
 
-#dl-form .linux{
+#dl-form .linux {
     background: url("../img/linux.png") left center no-repeat;
 }
 
-#dl-form .darwin{
+#dl-form .darwin {
     background: url("../img/mac.png") left center no-repeat;
 }
 
-#dl-form .btn{
+#dl-form .btn {
     font-size: 16px;
     height: 40px;
     padding: 0 1em;
@@ -221,36 +224,36 @@ a,.btn,.lbl{
 
 /* #termial */
 
-#terminal .ipt{
+#terminal .ipt {
     width: 80%;
 }
 
-#terminal .tip{
+#terminal .tip {
     padding-left: 0;
     margin-left: 0;
 }
 
 /* build */
-#build .project-header .status,#build .project-header .to-download{
+#build .project-header .status, #build .project-header .to-download {
     margin-top: 12px;
     margin-left: 24px;
 }
 
-#build .project-header .status{
+#build .project-header .status {
     color: #888;
 }
 
-#build .process-header{
+#build .process-header {
     margin-bottom: 24px;
     padding-bottom: 24px;
     border-bottom: 1px dashed #BBB;
 }
 
-#build .process-header input{
+#build .process-header input {
     margin-right: 18px;
 }
 
-#build .process-output{
+#build .process-output {
     margin-top: 24px;
     background-color: #444;
     color: #EEE;
@@ -259,6 +262,31 @@ a,.btn,.lbl{
     min-height: 360px;
 }
 
-#build .console{
-    font-family: Consolas, "Courier New", Arial,sans-serif;
+#build .console {
+    font-family: Consolas, "Courier New", Arial, sans-serif;
+}
+
+/* #search-result */
+
+#search-result {
+    margin-top: 24px;
+    margin-bottom: 40px;
+}
+
+#search-result h3 {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px dashed #BBB;
+}
+
+#search-result-list li {
+    margin-bottom: 24px;
+}
+
+#search-result-list li > * {
+    margin-right: 18px;
+}
+
+#search-result-list .visit, #search-result .thanks, #search-result .thanks a {
+    color: #888;
 }
