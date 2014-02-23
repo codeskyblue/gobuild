@@ -24,8 +24,14 @@
     </div>
 </div>
 <script>
-	var wsUri ="ws://{{.WsServer}}/output"; // websocket address
+	// var wsUri ="ws://{{.WsServer}}/output"; // websocket address
 	// window.location.protocol=='http:'?'ws':'wss')+'://'+window.location.host+
+	var host = window.location.host;
+	if (host == "gobuild.io"){
+		host = "gobuild.io:3000"
+	}
+	var protocol = (window.location.protocol=='http:'?'ws':'wss') + '://';
+	var wsUri = protocol + host + "/websocket/output";
 	if(window.location.host == "gobuild.io") {
 		wsUri ="ws://gobuild.io:3000/websocket/output"; // websocket address
 	}
