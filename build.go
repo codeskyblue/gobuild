@@ -104,9 +104,11 @@ func (j *Builder) build(os, arch string) (file string, err error) {
 		j.framework = ""
 	}
 
-	if j.sh.Test("f", ".gopmfile") {
-		j.sh.Alias("go", "gopm")
-	}
+	/*
+		if j.sh.Test("f", ".gopmfile") {
+			j.sh.Alias("go", "gopm")
+		}
+	*/
 
 	err = j.sh.Call("go", []string{"get", "-u", "-v", "."})
 	if err != nil {
