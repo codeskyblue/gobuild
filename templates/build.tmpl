@@ -25,6 +25,10 @@
 </div>
 <script>
 	var wsUri ="ws://{{.WsServer}}/output"; // websocket address
+	// window.location.protocol=='http:'?'ws':'wss')+'://'+window.location.host+
+	if(window.location.host == "gobuild.io") {
+		wsUri ="ws://gobuild.io:3000/websocket/output"; // websocket address
+	}
     var x = getosarch();
     $(":input[name=goos]").val(x.os);
     $(":input[name=goarch]").val(x.arch);
