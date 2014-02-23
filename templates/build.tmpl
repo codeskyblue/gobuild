@@ -32,9 +32,6 @@
 		host = "gobuild.io:3000"
 	}
 	var wsUri = protocol + "://" + host + "/websocket/output";
-	if(window.location.host == "gobuild.io") {
-		wsUri ="ws://gobuild.io:3000/websocket/output"; // websocket address
-	}
     var x = getosarch();
     $(":input[name=goos]").val(x.os);
     $(":input[name=goarch]").val(x.arch);
