@@ -1,6 +1,7 @@
 <div id="download">
     <div id="project" class="container">
-        <h3><a class="github" href="http://{{.Project}}" target="_blank" title="{{.Project}}">{{.Project}}</a></h3>
+        <h3><a class="github" href="http://{{.Project}}" target="_blank" title="{{.Project}}">{{.Project}}</a> <small><a href="/build/{{.Project}}">build console(new)</a></small></h3>
+	
     </div>
     <form id="dl-form" class="form form-align container" action="/dl">
         <input type="hidden" name="p" value="{{.Project}}" />

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -202,6 +203,9 @@ func (j *Builder) Auto() (addr string, err error) {
 		er := j.clean()
 		if er != nil {
 			lg.Warn(er)
+		}
+		if err != nil && j.wbc != nil {
+			io.WriteString(j.wbc, err.Error())
 		}
 		// FIXME: delete WriteBroadcaster after finish
 		// if build error, output will not saved, it is not a good idea
