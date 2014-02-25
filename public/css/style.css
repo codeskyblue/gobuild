@@ -14,6 +14,10 @@ a, .btn, .lbl {
     height: 60px;
     background: #282828;
     line-height: 60px;
+    position: fixed;
+    top:0;
+    width: 100%;
+    box-shadow: 0 0 8px #888;
 }
 
 #header .logo {
@@ -59,6 +63,11 @@ a, .btn, .lbl {
 #sign-in:hover {
     background-color: #005b9b !important;
     color: white !important;
+}
+
+#main{
+    margin-top: 60px;
+    padding-top: 1px;
 }
 
 /* hero container */
