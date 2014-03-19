@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"github.com/shxsun/go-sh"
 	"github.com/shxsun/goyaml"
 )
@@ -11,31 +12,31 @@ import beeutils "github.com/astaxie/beego/utils"
 // download src
 func (b *Builder) get() (err error) {
 	exists := beeutils.FileExists(b.srcDir)
-	b.sh.Call("date")
+	b.sh.Command("date")
 	if !exists {
-		err = b.sh.Call("go", []string{"get", "-v", "-d", b.project})
+		err = b.sh.Command("go", "get", "-v", "-d", b.project).Run()
 		if err != nil {
 			return
 		}
 	}
-	b.sh.Set(sh.Dir(b.srcDir))
+	b.sh.SetDir(b.srcDir)
 	if b.ref == "-" {
 		b.ref = "master"
 	}
-	if err = b.sh.Call("git", []string{"fetch", "origin"}); err != nil {
+	if err = b.sh.Command("git", "fetch", "origin").Run(); err != nil {
 		return
 	}
-	if err = b.sh.Call("git", []string{"checkout", "-q", b.ref}); err != nil {
+	if err = b.sh.Command("git", "checkout", "-q", b.ref).Run(); err != nil {
 		return
 	}
-	if err = b.sh.Call("git", []string{"merge", "origin/" + b.ref}); err != nil {
+	if err = b.sh.Command("git", "merge", "origin/"+b.ref).Run(); err != nil {
 		return
 	}
-	r, err := sh.Capture("git", []string{"rev-parse", "HEAD"}, sh.Dir(b.srcDir))
+	out, err := sh.Command("git", "rev-parse", "HEAD", sh.Dir(b.srcDir)).Output()
 	if err != nil {
 		return
 	}
-	b.sha = r.Trim()
+	b.sha = strings.TrimSpace(string(out))
 
 	// parse .gobuild
 	b.rc = new(Assembly)

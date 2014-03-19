@@ -84,42 +84,44 @@ func (b *Builder) init() (err error) {
 }
 
 // build src
-func (j *Builder) build(os, arch string) (file string, err error) {
-	j.sh.Env["GOOS"] = os
-	j.sh.Env["GOARCH"] = arch
-	j.sh.Set(sh.Dir(j.srcDir))
+func (this *Builder) build(os, arch string) (file string, err error) {
+	this.sh.Env["GOOS"] = os
+	this.sh.Env["GOARCH"] = arch
+	this.sh.SetDir(this.srcDir)
 
 	// switch framework
-	j.framework = j.rc.Framework
-	switch j.rc.Framework {
+	this.framework = this.rc.Framework
+	switch this.rc.Framework {
 	case "beego":
-		err = j.sh.Set(sh.Dir(j.srcDir)).Call("bee", []string{"pack", "-f", "zip"})
-		file = filepath.Join(j.srcDir, filepath.Base(j.project)) + ".zip"
+		err = this.sh.SetDir(this.srcDir).Call("bee", "pack", "-f", "zip")
+		file = filepath.Join(this.srcDir, filepath.Base(this.project)) + ".zip"
 		return
 	case "revel":
-		err = j.sh.Set(sh.Dir(j.srcDir)).Call("revel", []string{"package", j.project})
-		file = filepath.Join(j.srcDir, filepath.Base(j.project)) + ".tar.gz"
+		err = this.sh.SetDir(this.srcDir).Call("revel", "package", this.project)
+		file = filepath.Join(this.srcDir, filepath.Base(this.project)) + ".tar.gz"
 		return
 	default:
-		j.framework = ""
+		this.framework = ""
 	}
 
-	/*
-		if j.sh.Test("f", ".gopmfile") {
-			j.sh.Alias("go", "gopm")
-		}
-	*/
+	//if this.sh.Test("f", ".gopmfile") {
+	//	this.sh.Alias("go", "gopm")
+	//}
+	if this.sh.Test("d", "Godeps") {
+		this.sh.Call("godep", "go", "install")
+		return
+	}
 
-	err = j.sh.Call("go", []string{"get", "-u", "-v", "."})
+	err = this.sh.Call("go", "get", "-u", "-v", ".")
 	if err != nil {
 		return
 	}
 	// find binary
-	target := filepath.Base(j.project)
+	target := filepath.Base(this.project)
 	if os == "windows" {
 		target += ".exe"
 	}
-	return beeutils.SearchFile(target, j.gobin, filepath.Join(j.gobin, os+"_"+arch))
+	return beeutils.SearchFile(target, this.gobin, filepath.Join(this.gobin, os+"_"+arch))
 }
 
 // achieve and upload
@@ -132,7 +134,7 @@ func (b *Builder) publish(file string) (addr string, err error) {
 		if err != nil {
 			return
 		}
-		_, err = sh.Capture("mv", []string{"-v", file, path})
+		err = sh.Command("mv", "-v", file, path).Run()
 	}
 	if err != nil {
 		return
@@ -182,7 +184,7 @@ func (b *Builder) publish(file string) (addr string, err error) {
 
 // remove tmp file
 func (b *Builder) clean() (err error) {
-	b.sh.Call("echo", []string{"cleaning..."})
+	b.sh.Call("echo", "cleaning...")
 	err = os.RemoveAll(b.gobin)
 	return
 }

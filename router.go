@@ -76,8 +76,8 @@ func InitRouter() {
 		r.HTML(200, "document", data)
 	})
 
-	m.Get("/search/:keyword", func(params martini.Params, r render.Render) {
-		packages, err := NewSearch(params["keyword"])
+	m.Get("/search/**", func(params martini.Params, r render.Render) {
+		packages, err := NewSearch(params["_1"])
 		r.HTML(200, "search", map[string]interface{}{
 			"Keyword":        params["keyword"],
 			"Packages":       packages.Packages,
@@ -85,79 +85,5 @@ func InitRouter() {
 			"Error":          err,
 		})
 	})
-
 	initBadge()
 }
-
-/*
-	m.Get("/github.com/:account/:proj/:ref/:goos/:goarch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
-		var err error
-		var id = uuid.New()
-		ch := make(chan string, 1)
-		//scribe[id] = ch
-		// create log
-		outfd, err := os.OpenFile("log/"+id, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
-		if err != nil {
-			lg.Error(err)
-		}
-		defer outfd.Close()
-		// build cmd
-		cmd := exec.Command("bin/build", "github.com/"+p["account"]+"/"+p["proj"])
-		envs := []string{}
-		for k, v := range p {
-			envs = append(envs, strings.ToUpper(k)+"="+v)
-		}
-		envs = append(envs,
-			"GOROOT="+opts.GOROOT,
-			"BUILD_HOST="+"127.0.0.1:3000",
-			"BUILD_ID="+id)
-		cmd.Env = envs
-		cmd.Stdout = outfd
-		cmd.Stderr = outfd
-
-		err = cmd.Run()
-		if err != nil {
-			lg.Error(err)
-			return
-		}
-
-		var message string
-		select {
-		case message = <-ch:
-		case <-time.After(time.Second * 1):
-			message = "timeout"
-		}
-		lg.Info("finish build:", message)
-		http.Redirect(w, r, message, http.StatusTemporaryRedirect)
-		return
-	})
-
-	m.Get("/info/:id/output", func(p martini.Params) string {
-		return "unfinished"
-	})
-
-	m.Get("/github.com/**", func(params martini.Params, r render.Render) {
-		r.Redirect("/download/github.com/"+params["_1"], 302)
-	})
-*/
-
-/*
-	m.Get("/rebuild/**", func(params martini.Params, r render.Render) {
-		addr := params["_1"]
-		mu.Lock()
-		defer func() {
-			mu.Unlock()
-			r.Redirect("/build/"+addr, 302) // FIXME: this not good with nginx proxy
-		}()
-		br := broadcasts[addr]
-		lg.Debug("rebuild", addr, "END")
-		if br == nil {
-			return
-		}
-		if br.Closed() {
-			lg.Debug("rebuild:", addr)
-			delete(broadcasts, addr)
-		}
-		lg.Debug("end rebuild")
-	})
-*/

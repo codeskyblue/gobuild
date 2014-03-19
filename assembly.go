@@ -75,7 +75,7 @@ func (b *Builder) pack(bins []string, rcfile string) (path string, err error) {
 	lg.Debug(rcfile)
 	data, err := ioutil.ReadFile(rcfile)
 	if err != nil {
-		lg.Error(err)
+		lg.Warn(err)
 		lg.Debug("use default rc")
 		data, err = ioutil.ReadFile("public/gobuildrc")
 		if err != nil {
