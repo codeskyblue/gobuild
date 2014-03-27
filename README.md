@@ -1,7 +1,9 @@
 ## [gobuild.io](http://gobuild.io)
 [![Build Status](https://drone.io/github.com/shxsun/gobuild/status.png)](https://drone.io/github.com/shxsun/gobuild/latest)
 [![Go Walker](http://gowalker.org/api/v1/badge)](http://gowalker.org/github.com/shxsun/gobuild)
-[![Gobuild Download](https://gobuild.io/badge/github.com/shxsun/gobuild/download.png)](http://gobuild.io/github.com/shxsun/gobuild)
+[![Gobuild Download](http://gobuild.io/badge/github.com/shxsun/gobuild/download.png)](http://gobuild.io/github.com/shxsun/gobuild)
+
+*Thanks very much for you guys stars which encourage me to rewrite this website to gobuild2. Thanks very much. Thanks open source.*
 
 Go build + pacakge + distributions
 
