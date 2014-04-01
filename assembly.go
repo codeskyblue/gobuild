@@ -30,6 +30,7 @@ func match(bre string, str string) bool {
 }
 
 func pkgZip(root string, files []string) (path string, err error) {
+	lg.Warn(root, files)
 	tmpFile, err := utils.TempFile("files", "tmp-", "-"+filepath.Base(root)+".zip")
 	if err != nil {
 		return
@@ -41,8 +42,12 @@ func pkgZip(root string, files []string) (path string, err error) {
 	}
 	for _, f := range files {
 		var save string
+		if f == "" {
+			continue
+		}
 		// binary file use abspath
-		if strings.HasSuffix(root, f) {
+		//fmt.Println(root, f)
+		if strings.HasSuffix(f, root) {
 			save = f[len(root):]
 		} else {
 			save = filepath.Base(f)

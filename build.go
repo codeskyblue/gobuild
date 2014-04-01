@@ -107,10 +107,12 @@ func (this *Builder) build(os, arch string) (file string, err error) {
 	//if this.sh.Test("f", ".gopmfile") {
 	//	this.sh.Alias("go", "gopm")
 	//}
+	/* // close godep now
 	if this.sh.Test("d", "Godeps") {
-		this.sh.Call("godep", "go", "install")
+		err = this.sh.Call("godep", "go", "install")
 		return
 	}
+	*/
 
 	err = this.sh.Call("go", "get", "-u", "-v", ".")
 	if err != nil {
@@ -161,8 +163,17 @@ func (b *Builder) publish(file string) (addr string, err error) {
 		var err error
 		if *environment == "development" {
 			cdnAddr, err = UploadLocal(path)
+			name := fmt.Sprintf("%s-%s-%s-%s.%s",
+				filepath.Base(b.project),
+				b.os, b.arch, b.ref,
+				suffix)
+			fmt.Println(name)
 		} else {
-			cdnAddr, err = UploadFile(path, uuid.New()+"/"+filepath.Base(b.project)+suffix)
+			name := fmt.Sprintf("%s-%s-%s-%s.%s",
+				filepath.Base(b.project),
+				b.os, b.arch, b.tag,
+				suffix)
+			cdnAddr, err = UploadFile(path, uuid.New()+"/"+name)
 		}
 		if err != nil {
 			return
@@ -252,12 +263,11 @@ func (j *Builder) Auto() (addr string, err error) {
 	}
 
 	// build xc
-	//j.sh.Call("echo", "building")
+	// file maybe empty
 	file, err := j.build(j.os, j.arch)
 	if err != nil {
 		return
 	}
-	//}
 	// package build file(include upload)
 	addr, err = j.publish(file)
 	if err != nil {
