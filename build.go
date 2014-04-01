@@ -164,10 +164,9 @@ func (b *Builder) publish(file string) (addr string, err error) {
 		if *environment == "development" {
 			cdnAddr, err = UploadLocal(path)
 		} else {
-			name := fmt.Sprintf("%s-%s-%s-%s.%s",
+			name := fmt.Sprintf("%s-%s-%s-%s",
 				filepath.Base(b.project),
-				b.os, b.arch, b.ref,
-				suffix)
+				b.os, b.arch, b.ref) + suffix
 			cdnAddr, err = UploadFile(path, uuid.New()+"/"+name)
 		}
 		if err != nil {
