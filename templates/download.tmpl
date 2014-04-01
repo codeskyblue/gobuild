@@ -27,10 +27,8 @@
             </span>
         </p>
         <p class="field branch">
-            <label>Branch</label>
-            <span class="radio">
-                <input type="radio" name="version" value="master" class="chk" checked/><em>master</em>
-            </span>
+            <label>Branch|Tag</label>
+			<input type="text" name="branch" value="master">
         </p>
         <p>
             <label>&nbsp;</label>
@@ -54,6 +52,7 @@
         var $curl = $("#curl-addr");
         var $form = $("#dl-form");
 		var $os = $(":input[name=os]"), $arch = $(":input[name=arch]");
+		var $branch = $(":input[name=branch]");
 
 		var x = getosarch();
 		$os.filter("[value="+x.os+"]").attr("checked", true);
@@ -62,7 +61,7 @@
         var autoAddr = function () {
             var os = $os.filter(":checked").val(),
                     arch = $arch.filter(":checked").val(),
-                    link = "http://{{.Hostname}}/{{.Project}}/master/" + os + "/" + arch;
+                    link = "http://{{.Hostname}}/{{.Project}}/"+[$branch.val(), os, arch].join('/');
             $form.attr("action", link);
             $wget.val("wget " + link + " -O output.zip");
             $curl.val("curl -L " + link + " -o output.zip");

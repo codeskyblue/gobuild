@@ -12,7 +12,7 @@ import beeutils "github.com/astaxie/beego/utils"
 // download src
 func (b *Builder) get() (err error) {
 	exists := beeutils.FileExists(b.srcDir)
-	b.sh.Command("date")
+	b.sh.Command("go", "version").Run()
 	if !exists {
 		err = b.sh.Command("go", "get", "-v", "-d", b.project).Run()
 		if err != nil {
@@ -29,9 +29,9 @@ func (b *Builder) get() (err error) {
 	if err = b.sh.Command("git", "checkout", "-q", b.ref).Run(); err != nil {
 		return
 	}
-	if err = b.sh.Command("git", "merge", "origin/"+b.ref).Run(); err != nil {
-		return
-	}
+	//if err = b.sh.Command("git", "merge", "origin/"+b.ref).Run(); err != nil {
+	//	return
+	//}
 	out, err := sh.Command("git", "rev-parse", "HEAD", sh.Dir(b.srcDir)).Output()
 	if err != nil {
 		return
