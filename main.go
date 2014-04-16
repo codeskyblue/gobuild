@@ -14,11 +14,11 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/qiniu/api/conf"
+	"github.com/qiniu/log"
 	"github.com/shxsun/go-websocket"
 	"github.com/shxsun/gobuild/database"
 	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/goyaml"
-	"github.com/shxsun/klog"
 )
 
 var (
@@ -26,8 +26,7 @@ var (
 	broadcasts = make(map[string]*utils.WriteBroadcaster)
 	totalUser  = 0
 
-	lg = klog.DevLog
-
+	//log = klog.DevLog
 	//OS   = []string{"windows", "linux", "darwin"}
 	Arch = []string{"386", "amd64"}
 )
@@ -61,12 +60,12 @@ func NewStreamOutput(project, branch, goos, goarch string) *StreamOutput {
 			// start compiling job
 			_, err := NewBuilder(project, branch, goos, goarch, wb).Auto()
 			if err != nil {
-				lg.Error(err)
+				log.Error(err)
 			}
 			mu.Lock()
 			defer mu.Unlock()
 			delete(broadcasts, fullname)
-			lg.Info("delete broadcasts", project, broadcasts)
+			log.Info("delete broadcasts", project, broadcasts)
 		}()
 	}
 
@@ -106,7 +105,7 @@ func WsBuildServer(ws *websocket.Conn) {
 	}
 
 	name := ws.RemoteAddr().String()
-	lg.Debug(name)
+	log.Debug(name)
 
 	sout := NewStreamOutput(recvMsg.Project, recvMsg.Branch, recvMsg.GOOS, recvMsg.GOARCH)
 	defer sout.Close()
@@ -127,7 +126,7 @@ func WsBuildServer(ws *websocket.Conn) {
 			deadline := time.Now().Add(time.Second * 1)
 			ws.SetWriteDeadline(deadline)
 			if er := websocket.JSON.Send(ws, sendMsg); er != nil {
-				lg.Debug("write failed timeout, user logout")
+				log.Debug("write failed timeout, user logout")
 				return
 			}
 		}
@@ -163,11 +162,11 @@ func init() {
 	cfg := new(config)
 	in, err := ioutil.ReadFile("config.yaml")
 	if err != nil {
-		lg.Fatal(err)
+		log.Fatal(err)
 	}
 	err = goyaml.Unmarshal(in, cfg)
 	if err != nil {
-		lg.Fatal(err)
+		log.Fatal(err)
 	}
 
 	flag.Parse()
@@ -199,9 +198,9 @@ func main() {
 	var err error
 	err = database.InitDB(opts.Driver, opts.DataSource)
 	if err != nil {
-		lg.Fatal(err)
+		log.Fatal(err)
 	}
-	lg.Info("gobuild service stated ...")
+	log.Info("gobuild service stated ...")
 
 	http.Handle("/", m)
 	http.Handle("/websocket/", websocket.Handler(WsBuildServer))
@@ -211,12 +210,12 @@ func main() {
 		go func() {
 			er := http.ListenAndServeTLS(":443", "bin/ssl.crt", "bin/ssl.key", nil)
 			if er != nil {
-				lg.Error(er)
+				log.Error(er)
 			}
 		}()
 	}
 	err = http.ListenAndServe(opts.ListenAddr, nil)
 	if err != nil {
-		lg.Fatal(err)
+		log.Fatal(err)
 	}
 }

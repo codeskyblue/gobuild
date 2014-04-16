@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Unknwon/cae/zip"
+	"github.com/qiniu/log"
 	"github.com/shxsun/gobuild/utils"
 	"github.com/shxsun/goyaml"
 )
@@ -30,7 +31,7 @@ func match(bre string, str string) bool {
 }
 
 func pkgZip(root string, files []string) (path string, err error) {
-	lg.Warn(root, files)
+	log.Warn(root, files)
 	tmpFile, err := utils.TempFile("files", "tmp-", "-"+filepath.Base(root)+".zip")
 	if err != nil {
 		return
@@ -56,7 +57,7 @@ func pkgZip(root string, files []string) (path string, err error) {
 		if er != nil {
 			continue
 		}
-		lg.Debug("add", save, f)
+		log.Debug("add", save, f)
 		if info.IsDir() {
 			if err = z.AddDir(save, f); err != nil {
 				return
@@ -68,7 +69,7 @@ func pkgZip(root string, files []string) (path string, err error) {
 		}
 	}
 	if err = z.Close(); err != nil {
-		lg.Error(err)
+		log.Error(err)
 		return
 	}
 	return tmpFile, nil
@@ -76,15 +77,15 @@ func pkgZip(root string, files []string) (path string, err error) {
 }
 
 func (b *Builder) pack(bins []string, rcfile string) (path string, err error) {
-	lg.Debug(bins)
-	lg.Debug(rcfile)
+	log.Debug(bins)
+	log.Debug(rcfile)
 	data, err := ioutil.ReadFile(rcfile)
 	if err != nil {
-		lg.Warn(err)
-		lg.Debug("use default rc")
+		log.Warn(err)
+		log.Debug("use default rc")
 		data, err = ioutil.ReadFile("public/gobuildrc")
 		if err != nil {
-			lg.Error(err)
+			log.Error(err)
 		}
 	}
 	ass := new(Assembly)

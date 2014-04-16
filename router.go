@@ -9,6 +9,7 @@ import (
 
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
+	"github.com/qiniu/log"
 )
 
 func InitRouter() {
@@ -27,7 +28,7 @@ func InitRouter() {
 		job := NewBuilder(project, ref, os, arch, wb)
 		addr, err := job.Auto()
 		if err != nil {
-			lg.Error(err)
+			log.Error(err)
 			http.Error(w, "project build error: "+err.Error(), 500)
 		}
 		http.Redirect(w, r, addr, http.StatusTemporaryRedirect)
@@ -48,7 +49,7 @@ func InitRouter() {
 	})
 	m.Get("/build/**", func(params martini.Params, r render.Render) {
 		project := params["_1"]
-		lg.Debug(project, "END")
+		log.Debug(project, "END")
 		r.HTML(200, "build", map[string]string{
 			"FullName": project,
 			"WsServer": opts.Hostname + "/websocket",
@@ -58,7 +59,7 @@ func InitRouter() {
 	// all out links call redirect
 	m.Get("/redirect", func(w http.ResponseWriter, r *http.Request) {
 		url := r.FormValue("url")
-		lg.Info(url)
+		log.Info(url)
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	})
 	// about && document
@@ -69,7 +70,7 @@ func InitRouter() {
 		path := filepath.Join(filepath.Dir(os.Args[0]), "README.md")
 		readme, err := ioutil.ReadFile(path)
 		if err != nil {
-			lg.Error(err)
+			log.Error(err)
 		}
 		data := make(map[string]interface{}, 0)
 		data["Readme"] = string(readme)

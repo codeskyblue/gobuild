@@ -6,11 +6,9 @@ import (
 	"strings"
 
 	"github.com/Unknwon/cae/zip"
+	"github.com/qiniu/log"
 	"github.com/shxsun/gobuild/utils"
-	"github.com/shxsun/klog"
 )
-
-var log = klog.NewLogger(os.Stdout)
 
 type FileSet struct {
 	Includes []string `yaml:"includes"`

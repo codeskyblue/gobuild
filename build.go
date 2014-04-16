@@ -11,6 +11,7 @@ import (
 	"time"
 
 	beeutils "github.com/astaxie/beego/utils"
+	"github.com/qiniu/log"
 	"github.com/shxsun/go-sh"
 	"github.com/shxsun/go-uuid"
 	"github.com/shxsun/gobuild/database"
@@ -149,7 +150,7 @@ func (b *Builder) publish(file string) (addr string, err error) {
 	}
 	go func() {
 		defer func() {
-			lg.Debug("delete history:", b.tag)
+			log.Debug("delete history:", b.tag)
 			delete(history, b.tag)
 			go func() {
 				// leave 5min gap for unfinished downloading.
@@ -172,14 +173,14 @@ func (b *Builder) publish(file string) (addr string, err error) {
 		if err != nil {
 			return
 		}
-		lg.Debug("upload ok:", cdnAddr)
+		log.Debug("upload ok:", cdnAddr)
 		output := ""
 		if b.wbc != nil {
 			output = string(b.wbc.Bytes())
 		}
 		err = database.AddFile(b.pid, b.tag, cdnAddr, output)
 		if err != nil {
-			lg.Error(err)
+			log.Error(err)
 		}
 	}()
 	tmpAddr := "http://" + opts.Hostname + "/" + path
@@ -211,7 +212,7 @@ func (j *Builder) Auto() (addr string, err error) {
 	defer func() {
 		er := j.clean()
 		if er != nil {
-			lg.Warn(er)
+			log.Warn(er)
 		}
 		if err != nil && j.wbc != nil {
 			io.WriteString(j.wbc, err.Error())
@@ -229,8 +230,11 @@ func (j *Builder) Auto() (addr string, err error) {
 		return
 	}
 	// search db for history project record
+	log.Info("request project:", j.project)
+	log.Info("current sha:", j.sha)
 	p, err := database.SearchProject(j.project, j.sha)
 	if err != nil {
+		log.Info("exists in db", j.project, j.ref, j.sha)
 		pid, er := database.AddProject(j.project, j.ref, j.sha)
 		if er != nil {
 			err = er
@@ -250,7 +254,7 @@ func (j *Builder) Auto() (addr string, err error) {
 	}
 	// search database history
 	f, err := database.SearchFile(j.pid, j.tag)
-	lg.Debugf("search db: %v", f)
+	log.Debugf("search db: %v", f)
 	if err == nil {
 		addr = f.Addr
 		return
