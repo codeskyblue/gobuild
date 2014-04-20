@@ -28,7 +28,7 @@ func InitRouter() {
 		job := NewBuilder(project, ref, os, arch, wb)
 		addr, err := job.Auto()
 		if err != nil {
-			log.Error(err)
+			log.Error("auto build error:", err)
 			http.Error(w, "project build error: "+err.Error(), 500)
 		}
 		http.Redirect(w, r, addr, http.StatusTemporaryRedirect)

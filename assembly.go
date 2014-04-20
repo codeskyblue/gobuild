@@ -31,7 +31,7 @@ func match(bre string, str string) bool {
 }
 
 func pkgZip(root string, files []string) (path string, err error) {
-	log.Warn(root, files)
+	log.Info("package to zip:", path)
 	tmpFile, err := utils.TempFile("files", "tmp-", "-"+filepath.Base(root)+".zip")
 	if err != nil {
 		return
@@ -81,7 +81,6 @@ func (b *Builder) pack(bins []string, rcfile string) (path string, err error) {
 	log.Debug(rcfile)
 	data, err := ioutil.ReadFile(rcfile)
 	if err != nil {
-		log.Warn(err)
 		log.Debug("use default rc")
 		data, err = ioutil.ReadFile("public/gobuildrc")
 		if err != nil {

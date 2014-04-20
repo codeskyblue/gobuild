@@ -170,6 +170,7 @@ func init() {
 	}
 
 	flag.Parse()
+	log.SetOutputLevel(log.Ldebug)
 
 	if *environment == "development" {
 		opts = &cfg.Development

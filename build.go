@@ -20,6 +20,16 @@ import (
 
 var history = make(map[string]string)
 
+var logfd io.WriteCloser
+
+func init() {
+	var err error
+	logfd, err = os.OpenFile("build.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		log.Fatal("create build.log file failed:", err)
+	}
+}
+
 type Builder struct {
 	wbc      *utils.WriteBroadcaster
 	sh       *sh.Session
@@ -52,8 +62,8 @@ func NewBuilder(project, ref string, goos, arch string, wbc *utils.WriteBroadcas
 	}
 	b.sh.ShowCMD = true
 	if wbc != nil {
-		b.sh.Stdout = wbc
-		b.sh.Stderr = wbc
+		b.sh.Stdout = io.MultiWriter(logfd, wbc)
+		b.sh.Stderr = io.MultiWriter(logfd, wbc)
 	}
 	selfbin := beeutils.SelfDir() + "/bin"
 	env := map[string]string{
@@ -227,6 +237,7 @@ func (j *Builder) Auto() (addr string, err error) {
 	// download src (in order to get sha)
 	err = j.get()
 	if err != nil {
+		log.Error("download src error:", err)
 		return
 	}
 	// search db for history project record
@@ -246,6 +257,7 @@ func (j *Builder) Auto() (addr string, err error) {
 	}
 	// generate tag for builded-file search
 	j.tag = fmt.Sprintf("%d-%s-%s", j.pid, j.os, j.arch)
+	//log.Info("tag:", j.tag)
 
 	// search memory history
 	hisAddr, ok := history[j.tag]
@@ -264,6 +276,7 @@ func (j *Builder) Auto() (addr string, err error) {
 	// file maybe empty
 	file, err := j.build(j.os, j.arch)
 	if err != nil {
+		log.Error("build error:", err)
 		return
 	}
 	// package build file(include upload)
