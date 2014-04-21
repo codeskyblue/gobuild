@@ -29,7 +29,7 @@
 	var host = window.location.host;
 	var protocol = window.location.protocol=='http:'?'ws':'wss';
 	if (host == "gobuild.io" && protocol === "ws"){
-		host = "gobuild.io:3000"
+		host = "gobuild.io:7000"
 	}
 	var wsUri = protocol + "://" + host + "/websocket/output";
     var x = getosarch();

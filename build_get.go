@@ -35,7 +35,8 @@ func (b *Builder) get() (err error) {
 	}
 	// update code
 	if err = b.sh.Command("git", "merge", "origin/"+b.ref).Run(); err != nil {
-		return
+		log.Warn("git merge error:", err)
+		//return
 	}
 	// get sha
 	out, err := sh.Command("git", "rev-parse", "HEAD", sh.Dir(b.srcDir)).Output()
