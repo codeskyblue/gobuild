@@ -18,9 +18,8 @@ func InitRouter() {
 			"Hostname": opts.Hostname,
 		})
 	})
-
-	m.Get("/github.com/:account/:proj/:ref/:os/:arch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
-		project := "github.com/" + p["account"] + "/" + p["proj"]
+	m.Get("/github.com/**/:ref/(?P<os>(windows|linux|darwin))/:arch", func(p martini.Params, w http.ResponseWriter, r *http.Request) {
+		project := "github.com/" + p["_1"]
 		ref := p["ref"]
 		os, arch := p["os"], p["arch"]
 		fullname := strings.Join([]string{project, ref, os, arch}, "-")
@@ -30,6 +29,7 @@ func InitRouter() {
 		if err != nil {
 			log.Error(err)
 			http.Error(w, "project build error: "+err.Error(), 500)
+			return
 		}
 		http.Redirect(w, r, addr, http.StatusTemporaryRedirect)
 	})
