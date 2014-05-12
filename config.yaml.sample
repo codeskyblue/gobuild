@@ -8,10 +8,10 @@ development:
 
 production:
     hostname: gobuild.io
-    listen: 0.0.0.0:3000
+    listen: 0.0.0.0:7000
     driver: mysql
     data_source: root:toor@tcp(skyblue:3306)/gobuild
-    goroot: /usr/local/go 
+    goroot: /usr/src/go 
     # qiniu
     access_key: BgESh3GconLxVmqlkM19U3ANknrCsTWwIx67S3fo
     secret_key: xxxx

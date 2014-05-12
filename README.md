@@ -88,3 +88,6 @@ solutions: use environment variables to get use-name <http://stackoverflow.com/q
 * [skyblue](https://github.com/shxsun)
 * [Codefor](https://github.com/Codefor)
 * ...
+
+### news
+[gobuild2](https://github.com/gobuild/gobuild2) was developing...
