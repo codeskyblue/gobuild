@@ -11,11 +11,11 @@ import (
 	"time"
 
 	beeutils "github.com/astaxie/beego/utils"
+	"github.com/codeskyblue/go-sh"
+	"github.com/codeskyblue/go-uuid"
+	"github.com/codeskyblue/gobuild/database"
+	"github.com/codeskyblue/gobuild/utils"
 	"github.com/qiniu/log"
-	"github.com/shxsun/go-sh"
-	"github.com/shxsun/go-uuid"
-	"github.com/shxsun/gobuild/database"
-	"github.com/shxsun/gobuild/utils"
 )
 
 var history = make(map[string]string)

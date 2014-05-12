@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/Unknwon/cae/zip"
+	"github.com/codeskyblue/gobuild/utils"
 	"github.com/qiniu/log"
-	"github.com/shxsun/gobuild/utils"
 )
 
 type FileSet struct {

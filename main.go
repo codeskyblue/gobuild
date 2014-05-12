@@ -13,12 +13,12 @@ import (
 
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
+	"github.com/codeskyblue/go-websocket"
+	"github.com/codeskyblue/gobuild/database"
+	"github.com/codeskyblue/gobuild/utils"
+	"github.com/codeskyblue/goyaml"
 	"github.com/qiniu/api/conf"
 	"github.com/qiniu/log"
-	"github.com/shxsun/go-websocket"
-	"github.com/shxsun/gobuild/database"
-	"github.com/shxsun/gobuild/utils"
-	"github.com/shxsun/goyaml"
 )
 
 var (

@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/shxsun/goyaml"
+	"github.com/codeskyblue/goyaml"
 )
 
 func Debugf(format string, a ...interface{}) {
