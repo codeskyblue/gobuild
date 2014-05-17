@@ -3,6 +3,8 @@
 [![Go Walker](http://gowalker.org/api/v1/badge)](http://gowalker.org/github.com/codeskyblue/gobuild)
 [![Gobuild Download](http://gobuild.io/badge/github.com/codeskyblue/gobuild/download.png)](http://gobuild.io/github.com/codeskyblue/gobuild)
 
+QQ Group: [368327021](http://shang.qq.com/wpa/qunwpa?idkey=48933b5fc6e840d4b871feffee4fa05e08e23cd201f7b6c7944cad3faf375565)
+
 *Thanks very much for you guys stars which encourage me to rewrite this website to gobuild2. Thanks very much. Thanks open source.*
 
 Go build + pacakge + distributions
