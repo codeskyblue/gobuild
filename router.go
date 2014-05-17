@@ -39,10 +39,11 @@ func InitRouter() {
 		http.Redirect(w, r, newAddr, http.StatusTemporaryRedirect)
 	})
 
-	m.Get("/download/**", func(params martini.Params, r render.Render) {
+	m.Get("/download/github.com/**", func(params martini.Params, r render.Render) {
 		addr := params["_1"]
 		r.HTML(200, "download", map[string]interface{}{
-			"Project":  addr,
+			"Project":  "github.com/"+addr,
+			"ProjectShortName": addr,
 			"Hostname": opts.Hostname,
 			"Name":     filepath.Base(addr),
 		})

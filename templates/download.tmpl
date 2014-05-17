@@ -1,7 +1,6 @@
 <div id="download">
     <div id="project" class="container">
         <h3><a class="github" href="http://{{.Project}}" target="_blank" title="{{.Project}}">{{.Project}}</a> <small><a href="/build/{{.Project}}">build console(new)</a></small></h3>
-	
     </div>
     <form id="dl-form" class="form form-align container" action="/dl">
         <input type="hidden" name="p" value="{{.Project}}" />
@@ -36,6 +35,11 @@
         </p>
     </form>
     <div id="terminal" class="container form">
+        <h4>Use <code>got</code></h4>
+        <p class="field">
+            command line tool for gobuild: <a href="github.com/gobuild/got">github.com/gobuild/got</a><br/>
+            very simple to use: <input type="text" value="got install {{.ProjectShortName}}" readonly/>
+        </p>
         <h4>Use Terminal</h4>
         <p class="field">
             <input id="wget-addr" type="text" name="wget-addr" class="ipt" readonly/>
