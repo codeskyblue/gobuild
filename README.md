@@ -10,7 +10,7 @@ QQ Group: [368327021](http://shang.qq.com/wpa/qunwpa?idkey=48933b5fc6e840d4b871f
 
 *Thanks very much for you guys stars which encourage me to rewrite this website to gobuild2. Thanks very much. Thanks open source.*
 
-Go build + pacakge + distributions
+Go build + package + distributions
 
 There are a lot of golang open souce project, sometime we want to share code, sometimes we want to share binary file to friends.
 But few website offers golang binary shares. So I created one.
