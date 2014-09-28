@@ -1,3 +1,5 @@
+# Project moved to <https://github.com/gobuild/gobuild3>
+-----------------------
 ## [gobuild.io](http://gobuild.io)
 [![Build Status](https://drone.io/github.com/codeskyblue/gobuild/status.png)](https://drone.io/github.com/codeskyblue/gobuild/latest)
 [![Go Walker](http://gowalker.org/api/v1/badge)](http://gowalker.org/github.com/codeskyblue/gobuild)
