@@ -2,7 +2,7 @@ package rs
 
 import (
 	"github.com/qiniu/rpc"
-	. "github.com/qiniu/api/conf"
+	. "github.com/qiniu/api.v6/conf"
 )
 
 // ----------------------------------------------------------

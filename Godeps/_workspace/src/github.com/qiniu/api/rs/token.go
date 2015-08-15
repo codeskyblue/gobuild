@@ -5,8 +5,8 @@ import (
 	"strings"
 	"strconv"
 	"encoding/json"
-	"github.com/qiniu/api/url"
-	"github.com/qiniu/api/auth/digest"
+	"github.com/qiniu/api.v6/url"
+	"github.com/qiniu/api.v6/auth/digest"
 )
 
 // ----------------------------------------------------------
