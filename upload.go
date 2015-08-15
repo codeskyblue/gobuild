@@ -5,8 +5,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/qiniu/api/io"
-	"github.com/qiniu/api/rs"
+	"github.com/qiniu/api.v6/io"
+	"github.com/qiniu/api.v6/rs"
 )
 
 const SCOPE = "gobuild-io"

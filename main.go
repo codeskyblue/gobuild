@@ -17,7 +17,7 @@ import (
 	"github.com/codeskyblue/gobuild/database"
 	"github.com/codeskyblue/gobuild/utils"
 	"github.com/codeskyblue/goyaml"
-	"github.com/qiniu/api/conf"
+	"github.com/qiniu/api.v6/conf"
 	"github.com/qiniu/log"
 )
 

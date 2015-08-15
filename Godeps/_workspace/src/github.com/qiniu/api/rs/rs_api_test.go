@@ -3,8 +3,8 @@ package rs
 import (
 	"os"
 	"testing"
-	"github.com/qiniu/api/io"
-	. "github.com/qiniu/api/conf"
+	"github.com/qiniu/api.v6/io"
+	. "github.com/qiniu/api.v6/conf"
 )
 
 var (

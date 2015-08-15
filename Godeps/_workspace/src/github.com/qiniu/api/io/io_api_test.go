@@ -6,8 +6,8 @@ import (
 	"io"
 	"os"
 	"testing"
-	"github.com/qiniu/api/rs"
-	. "github.com/qiniu/api/conf"
+	"github.com/qiniu/api.v6/rs"
+	. "github.com/qiniu/api.v6/conf"
 )
 
 var (
