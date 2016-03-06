@@ -1,4 +1,4 @@
-# Project moved to <https://github.com/gobuild/gobuild3>
+# Project moved to <https://github.com/gobuild/gobuild>
 -----------------------
 ## [gobuild.io](http://gobuild.io)
 [![Build Status](https://drone.io/github.com/codeskyblue/gobuild/status.png)](https://drone.io/github.com/codeskyblue/gobuild/latest)
